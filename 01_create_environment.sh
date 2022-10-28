@@ -14,13 +14,17 @@ docker stop web2epub$CONT_ITER
 docker rm -f web2epub$CONT_ITER
 #rm -rf "$PG_PATH"
 docker run --name web2epub$CONT_ITER --detach -p 5432:543$CONT_ITER -e POSTGRES_PASSWORD=$PGPWD -v $SCRIPT_PATH:/tmp/scripts:ro -v $DB_PATH:/tmp/DB:ro --add-host=host.docker.internal:host-gateway $PG_IMAGE
-sleep 10
+# sleep 10
 # cp -r -a "$CURRENT_DIR/data/postgres/db/" "$PG_EXCHANGE"
 
-docker exec web2epub$CONT_ITER /bin/sh -c '/tmp/DB/restore.ps'
 docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get update -y'
 docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get upgrade -y'
 docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get install -y python3'
+docker exec web2epub$CONT_ITER /bin/sh -c 'apt install libpq5=9.6.24-0+deb9u1'
+docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get install -y python3-pip'
+docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get install libpq-dev'
+docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install psycopg2-binary'
+docker exec web2epub$CONT_ITER /bin/sh -c '/tmp/DB/restore.ps'
 
 # docker exec pg$CONT_ITER /bin/sh -c 'psql postgres --host=localhost --username=postgres -f /tmp/db/create_user_database.sql'
 # docker exec pg$CONT_ITER /bin/sh -c 'psql postgres --host=localhost --username=postgres -d test.db -f /tmp/db/test.db'
