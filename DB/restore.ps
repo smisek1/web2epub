@@ -1,3 +1,4 @@
-psql -U borec backuptest4 -f /home/smich/Documents/_git/Automatization/Projects/Python/Project_01/DB/conversion
+createdb -U postgres -T template0 conversion 
+psql -U postgres conversion -f /tmp/conversion
 
 # "C:\Program Files\PostgreSQL\9.3\bin\psql" -U borec -d backuptest2 -f C:/_git/Automatization/Projects/Python/Project_01/DB/conversion

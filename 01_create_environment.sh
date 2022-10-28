@@ -1,17 +1,22 @@
 # === POSTGRES ===
 
+#!/usr/bin/env bash
+CURRENT_DIR="$( cd "$( dirname "$0" )" && pwd )"
+DB_PATH="$CURRENT_DIR/DB"
 CONT_ITER="2"
 PG_PATH="$TEMP_PATH/postgres$CONT_ITER"
-PG_EXCHANGE="$PG_PATH/exchange"
+#PG_EXCHANGE="$PG_PATH/exchange"
 PG_IMAGE='postgres:11.14'
 PGPWD='Pa$$w0rd'
 
 docker stop web2epub$CONT_ITER
 docker rm -f web2epub$CONT_ITER
-rm -rf "$PG_PATH"
-docker run --name web2epub$CONT_ITER --detach -p 5432:543$CONT_ITER -e POSTGRES_PASSWORD=$PGPWD -v $PG_EXCHANGE:/tmp:rw --add-host=host.docker.internal:host-gateway $PG_IMAGE
-sleep 3
+#rm -rf "$PG_PATH"
+docker run --name web2epub$CONT_ITER --detach -p 5432:543$CONT_ITER -e POSTGRES_PASSWORD=$PGPWD -v $DB_PATH:/tmp:ro --add-host=host.docker.internal:host-gateway $PG_IMAGE
+sleep 10
 # cp -r -a "$CURRENT_DIR/data/postgres/db/" "$PG_EXCHANGE"
+
+docker exec web2epub$CONT_ITER /bin/sh -c '/tmp/restore.ps'
 
 # docker exec pg$CONT_ITER /bin/sh -c 'psql postgres --host=localhost --username=postgres -f /tmp/db/create_user_database.sql'
 # docker exec pg$CONT_ITER /bin/sh -c 'psql postgres --host=localhost --username=postgres -d test.db -f /tmp/db/test.db'
