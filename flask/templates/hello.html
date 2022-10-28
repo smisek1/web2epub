@@ -1,0 +1,94 @@
+<!doctype html>
+<--https://stackoverflow.com/questions/386281/how-to-implement-select-all-check-box-in-html
+https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option-->
+<html>
+    <head>
+        <title>Hello from Flask</title>
+    </head>
+    <body>
+    <SCRIPT>
+    var expanded = false;
+
+function showCheckboxes() {
+  var checkboxes = document.getElementById("checkboxes");
+  if (!expanded) {
+    checkboxes.style.display = "block";
+    expanded = true;
+  } else {
+    checkboxes.style.display = "none";
+    expanded = false;
+  }
+}
+</SCRIPT>
+<STYLE>
+.multiselect {
+  width: 200px;
+}
+
+.selectBox {
+  position: relative;
+}
+
+.selectBox select {
+  width: 100%;
+  font-weight: bold;
+}
+
+.overSelect {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+#checkboxes {
+  display: none;
+  border: 1px #dadada solid;
+}
+
+#checkboxes label {
+  display: block;
+}
+
+#checkboxes label:hover {
+  background-color: #1e90ff;
+}
+</STYLE>
+<form>
+
+</form>
+        <form action = "/login" method = "post">
+            <p>Enter Name: <input type="text"  name="nazev"/></p>
+            <p><input name="submit_button" type = "submit" value = "Nechci cist" />
+            <input name="submit_button" type = "submit" value = "Vytvorit knihu" /></p>
+        <table>
+            <tr><td></td><td>
+              <div class="multiselect">
+                    <div class="selectBox" onclick="showCheckboxes()">
+                    <select>
+                        <option>Vyber www stranku</option>
+                    </select>
+                    <div class="overSelect"></div>
+                    </div>
+                    <div id="checkboxes">
+                    <label for="one">
+                        <input type="checkbox" id="one" />First checkbox</label>
+                    <label for="two">
+                        <input type="checkbox" id="two" />Second checkbox</label>
+                    <label for="three">
+                        <input type="checkbox" id="three" />Third checkbox</label>
+                    </div>
+                </div>
+            </td></tr>
+            {% for clanek in clanky %}
+                <tr>
+                <td><input type="checkbox" name="id" value="{{ clanek[0] }}" /></td>
+                <td>{{ clanek[2] }}</td>
+                <td><a href="{{ clanek[5] }}">{{ clanek[1] }}</a></td>
+                <td>{{ clanek[4] }}</td></tr>
+            {% endfor %}
+        </table>
+        </form>
+    </body>
+</html>
