@@ -29,6 +29,14 @@ echo "***********apt-get install -y libpq-dev**********"
 docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get install -y libpq-dev'
 echo "************pip3 install psycopg2*********"
 docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install psycopg2'
+echo "**********apt-get install -y python3 python3-dev python3-pip libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev***********"
+docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get install -y python3 python3-dev python3-pip libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev'
+echo "************pip3 install --upgrade setuptools*********"
+docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install --upgrade setuptools'
+echo "*************pip3 install --upgrade --user pip********"
+docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install --upgrade --user pip'
+echo "************pip3 install scrapy*********"
+docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install scrapy'
 echo "************/tmp/DB/restore.ps*********"
 docker exec web2epub$CONT_ITER /bin/sh -c '/tmp/DB/restore.ps'
 
