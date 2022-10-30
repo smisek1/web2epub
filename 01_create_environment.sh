@@ -4,6 +4,8 @@
 CURRENT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 DB_PATH="$CURRENT_DIR/DB"
 SCRIPT_PATH="$CURRENT_DIR/scripts"
+TMP_PATH="$CURRENT_DIR/tmp"
+WEB_INTERFACE_PATH="$CURRENT_DIR/web"
 CONT_ITER="2"
 PG_PATH="$TEMP_PATH/postgres$CONT_ITER"
 #PG_EXCHANGE="$PG_PATH/exchange"
@@ -13,7 +15,7 @@ PGPWD='Pa$$w0rd'
 docker stop web2epub$CONT_ITER
 docker rm -f web2epub$CONT_ITER
 #rm -rf "$PG_PATH"
-docker run --name web2epub$CONT_ITER --detach -p 5432:543$CONT_ITER -e POSTGRES_PASSWORD=$PGPWD -v $SCRIPT_PATH:/tmp/scripts:ro -v $DB_PATH:/tmp/DB:ro --add-host=host.docker.internal:host-gateway $PG_IMAGE
+docker run --name web2epub$CONT_ITER --detach -p 5432:543$CONT_ITER -p 5000:5000 -e POSTGRES_PASSWORD=$PGPWD -v  $WEB_INTERFACE_PATH:/tmp/web -v $TMP_PATH:/tmp/tmp:rw -v $SCRIPT_PATH:/tmp/scripts:ro -v $DB_PATH:/tmp/DB:ro --add-host=host.docker.internal:host-gateway $PG_IMAGE
 # sleep 10
 # cp -r -a "$CURRENT_DIR/data/postgres/db/" "$PG_EXCHANGE"
 
@@ -39,6 +41,10 @@ echo "************pip3 install scrapy*********"
 docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install scrapy'
 echo "************pip3 install EbookLib*********"
 docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install EbookLib'
+echo "***********/tmp/DB/restore.ps**********"
+docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install requests'
+echo "************pip3 install dateparser*********"
+docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install dateparser'
 echo "************/tmp/DB/restore.ps*********"
 docker exec web2epub$CONT_ITER /bin/sh -c '/tmp/DB/restore.ps'
 

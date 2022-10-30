@@ -5,7 +5,7 @@ import os
 import get_html
 from scrapy.selector import Selector
 
-from bs4 import BeautifulSoup
+#from bs4 import BeautifulSoup
 import requests
 import dateparser
 
