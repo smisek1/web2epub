@@ -37,6 +37,8 @@ echo "*************pip3 install --upgrade --user pip********"
 docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install --upgrade --user pip'
 echo "************pip3 install scrapy*********"
 docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install scrapy'
+echo "************pip3 install EbookLib*********"
+docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install EbookLib'
 echo "************/tmp/DB/restore.ps*********"
 docker exec web2epub$CONT_ITER /bin/sh -c '/tmp/DB/restore.ps'
 
