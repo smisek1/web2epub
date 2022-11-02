@@ -15,8 +15,8 @@ PGPWD='Pa$$w0rd'
 docker stop web2epub$CONT_ITER
 docker rm -f web2epub$CONT_ITER
 #rm -rf "$PG_PATH"
-docker run --name web2epub$CONT_ITER --detach -p 5432:543$CONT_ITER -p 5000:5000 -e POSTGRES_PASSWORD=$PGPWD -v  $WEB_INTERFACE_PATH:/tmp/web -v $TMP_PATH:/tmp/tmp:rw -v $SCRIPT_PATH:/tmp/scripts:ro -v $DB_PATH:/tmp/DB:ro --add-host=host.docker.internal:host-gateway $PG_IMAGE
-# sleep 10
+docker run --name web2epub$CONT_ITER --detach -p 5432:543$CONT_ITER -p 5000:5000 -e POSTGRES_PASSWORD=$PGPWD -v  $WEB_INTERFACE_PATH:/tmp/web -v $TMP_PATH:/tmp/tmp:rw -v $SCRIPT_PATH:/tmp/scripts:ro -v $DB_PATH:/tmp/DB:ro $PG_IMAGE
+# sleep 10 --add-host=host.docker.internal:host-gateway 
 # cp -r -a "$CURRENT_DIR/data/postgres/db/" "$PG_EXCHANGE"
 
 docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get update -y'
@@ -45,6 +45,8 @@ echo "***********/tmp/DB/restore.ps**********"
 docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install requests'
 echo "************pip3 install dateparser*********"
 docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install dateparser'
+echo "***********pip3 install Flask**********"
+docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install Flask'
 echo "************/tmp/DB/restore.ps*********"
 docker exec web2epub$CONT_ITER /bin/sh -c '/tmp/DB/restore.ps'
 
