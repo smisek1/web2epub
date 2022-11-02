@@ -19,8 +19,10 @@ docker run --name web2epub$CONT_ITER --detach -p 5432:543$CONT_ITER -p 5000:5000
 # sleep 10 --add-host=host.docker.internal:host-gateway 
 # cp -r -a "$CURRENT_DIR/data/postgres/db/" "$PG_EXCHANGE"
 
+echo "***********apt-get update -y**********"
 docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get update -y'
-docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get upgrade -y'
+echo "***********apt-get upgrade -y**********"
+# docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get upgrade -y'
 echo "*******apt-get install -y python3**************"
 docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get install -y python3'
 echo "***********apt-get install -y python3-pip**********"

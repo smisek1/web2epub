@@ -10,6 +10,7 @@ import importlib
 currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0,parentdir) 
+sys.path.insert(0,parentdir + "/scripts") 
 import database
 import create_book    
 clanky = database.select_clanky()
@@ -45,7 +46,7 @@ def login():
         return redirect(url_for('hello',ide = id_clanku))
       elif request.form['submit_button'] == 'Vytvorit knihu':
         database.insert_book(kniha,id_clanku)
-        os.chdir('/home/smich/Documents/temp')
+        os.chdir('/tmp/tmp')
         tvorbakniha = create_book.create_book(kniha)
         a = database.select_clanky_pro_epub(kniha)
         for b in a.clanky:
