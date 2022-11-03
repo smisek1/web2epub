@@ -51,6 +51,8 @@ echo "***********pip3 install Flask**********"
 docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install Flask'
 echo "************/tmp/DB/restore.ps*********"
 docker exec web2epub$CONT_ITER /bin/sh -c '/tmp/DB/restore.ps'
+echo "*********nohup /tmp/web/flask.sh &************"
+docker exec web2epub$CONT_ITER /bin/sh -c 'nohup /tmp/web/flask.sh &'
 
 # docker exec pg$CONT_ITER /bin/sh -c 'psql postgres --host=localhost --username=postgres -f /tmp/db/create_user_database.sql'
 # docker exec pg$CONT_ITER /bin/sh -c 'psql postgres --host=localhost --username=postgres -d test.db -f /tmp/db/test.db'
