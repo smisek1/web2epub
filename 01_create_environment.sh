@@ -15,42 +15,11 @@ PGPWD='Pa$$w0rd'
 docker stop web2epub$CONT_ITER
 docker rm -f web2epub$CONT_ITER
 #rm -rf "$PG_PATH"
-docker run --name web2epub$CONT_ITER --detach -p 5432:543$CONT_ITER -p 5000:5000 -e POSTGRES_PASSWORD=$PGPWD -v  $WEB_INTERFACE_PATH:/tmp/web -v $TMP_PATH:/tmp/tmp:rw -v $SCRIPT_PATH:/tmp/scripts:ro -v $DB_PATH:/tmp/DB:ro $PG_IMAGE
-# sleep 10 --add-host=host.docker.internal:host-gateway 
+docker run --name web2epub$CONT_ITER --detach -p 5432:543$CONT_ITER -p 5000:5000 -e POSTGRES_PASSWORD=$PGPWD -v  $WEB_INTERFACE_PATH:/app/web -v $TMP_PATH:/tmp:rw -v $SCRIPT_PATH:/app/scripts:ro -v $DB_PATH:/app/DB:ro $PG_IMAGE
+sleep 10 #--add-host=host.docker.internal:host-gateway 
 # cp -r -a "$CURRENT_DIR/data/postgres/db/" "$PG_EXCHANGE"
 
-echo "***********apt-get update -y**********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get update -y'
-echo "***********apt-get upgrade -y**********"
-# docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get upgrade -y'
-echo "*******apt-get install -y python3**************"
-docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get install -y python3'
-echo "***********apt-get install -y python3-pip**********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get install -y python3-pip'
-echo "***********apt-get install -y libpq5=9.6.24-0+deb9u1**********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get install -y --allow-downgrades libpq5=9.6.24-0+deb9u1'
-echo "***********apt-get install -y libpq-dev**********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get install -y libpq-dev'
-echo "************pip3 install psycopg2*********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install psycopg2'
-echo "**********apt-get install -y python3 python3-dev python3-pip libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev***********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'apt-get install -y python3 python3-dev python3-pip libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev'
-echo "************pip3 install --upgrade setuptools*********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install --upgrade setuptools'
-echo "*************pip3 install --upgrade --user pip********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install --upgrade --user pip'
-echo "************pip3 install scrapy*********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install scrapy'
-echo "************pip3 install EbookLib*********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install EbookLib'
-echo "***********/tmp/DB/restore.ps**********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install requests'
-echo "************pip3 install dateparser*********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install dateparser'
-echo "***********pip3 install Flask**********"
-docker exec web2epub$CONT_ITER /bin/sh -c 'pip3 install Flask'
-echo "************/tmp/DB/restore.ps*********"
-docker exec web2epub$CONT_ITER /bin/sh -c '/tmp/DB/restore.ps'
+docker exec web2epub$CONT_ITER /bin/sh -c '/app/DB/restore.ps'
 
 # docker exec pg$CONT_ITER /bin/sh -c 'psql postgres --host=localhost --username=postgres -f /tmp/db/create_user_database.sql'
 # docker exec pg$CONT_ITER /bin/sh -c 'psql postgres --host=localhost --username=postgres -d test.db -f /tmp/db/test.db'

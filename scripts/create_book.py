@@ -2,9 +2,9 @@ import sys
 import os
 from scrapy.selector import Selector
 import base64
-sys.path.insert(0, "/tmp/tmp")
+sys.path.insert(0, "/tmp")
 from ebooklib import epub
-os.chdir('/tmp/tmp')
+os.chdir('/tmp')
 
 class create_book():
     def __init__(self,jmeno_knihy):
