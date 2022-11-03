@@ -13,6 +13,7 @@ sys.path.insert(0,parentdir)
 sys.path.insert(0,parentdir + "/scripts") 
 import database
 import create_book    
+import get_html
 clanky = database.select_clanky()
 from flask import render_template
 app = Flask(__name__)
@@ -52,6 +53,9 @@ def login():
         for b in a.clanky:
             tvorbakniha.add_kap(b[2],b[1],b[3],b[4],b[5],b[6])
         tvorbakniha.write_knihu(kniha)
+        return redirect(url_for('hello',ide = id_clanku))
+      elif request.form['submit_button'] == 'Nacti':
+        get_html.main_throuhgh_sites()
         return redirect(url_for('hello',ide = id_clanku))
    else:
       ids = request.form['id']
