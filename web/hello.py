@@ -57,6 +57,9 @@ def login():
         tvorbakniha.write_knihu(kniha)
         file = kniha + ".epub"
         # return render_template('download.html')
+        @after_this_request
+        def redirect_after_download(response):
+            return send_file('/tmp/'+ file, as_attachment=True)
         return redirect(url_for('hello',ide = id_clanku))
       elif request.form['submit_button'] == 'Nacti':
         get_html.main_throuhgh_sites()

@@ -22,15 +22,17 @@
 
 FROM postgres:9.6
 RUN apt-get update
-RUN apt-get install -y python3 python3-pip python3-dev
+RUN apt-get install -y python3 python3-pip python3-dev 
 RUN apt-get install -y --allow-downgrades libpq5=9.6.24-0+deb9u1
 RUN apt-get install -y libpq-dev
 RUN pip3 install --upgrade --user pip
 RUN pip3 install psycopg2
 RUN apt-get install -y libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev
 RUN pip3 install --upgrade setuptools
+RUN apt-get install -y cron vim
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
+RUN (crontab -l 2>/dev/null; echo "*/5 * * * * python3 /tmp/scripts/test.py") | crontab -
 
 # WORKDIR /app
 # COPY . /app
