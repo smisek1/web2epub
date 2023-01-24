@@ -1,0 +1,6 @@
+scrapy
+EbookLib
+requests
+dateparser
+Flask
+

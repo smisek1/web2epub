@@ -49,7 +49,7 @@ def login():
         return redirect(url_for('hello',ide = id_clanku))
       elif request.form['submit_button'] == 'Vytvorit knihu':
         database.insert_book(kniha,id_clanku)
-        os.chdir('/tmp/tmp')
+        os.chdir('/tmp')
         tvorbakniha = create_book.create_book(kniha)
         a = database.select_clanky_pro_epub(kniha)
         for b in a.clanky:
