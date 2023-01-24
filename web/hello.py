@@ -1,6 +1,8 @@
 from flask import Flask, redirect, url_for, request
 from flask import Flask
 from flask import url_for
+from flask import send_from_directory, after_this_request, render_template
+from flask import make_response, render_template, after_this_request, request, send_file
 import os,sys,inspect
 import sys
 from importlib import reload
@@ -13,6 +15,7 @@ sys.path.insert(0,parentdir)
 sys.path.insert(0,parentdir + "/scripts") 
 import database
 import create_book    
+import get_html
 clanky = database.select_clanky()
 from flask import render_template
 app = Flask(__name__)
@@ -52,10 +55,19 @@ def login():
         for b in a.clanky:
             tvorbakniha.add_kap(b[2],b[1],b[3],b[4],b[5],b[6])
         tvorbakniha.write_knihu(kniha)
+        file = kniha + ".epub"
+        # return render_template('download.html')
+        return redirect(url_for('hello',ide = id_clanku))
+      elif request.form['submit_button'] == 'Nacti':
+        get_html.main_throuhgh_sites()
         return redirect(url_for('hello',ide = id_clanku))
    else:
       ids = request.form['id']
       return redirect(url_for('success',ide = ids))
+@app.route('/download')
+def downloadfile():
+ # return send_from_directory(directory="/tmp/tmp", filename=file, as_attachment=True)
+ return send_file('/tmp/tmp/20.epub', as_attachment=True)
 ##################
 
 
