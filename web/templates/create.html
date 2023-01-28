@@ -55,6 +55,18 @@ function showCheckboxes() {
   background-color: #1e90ff;
 }
 </STYLE>
+
+<script>
+function selectAllCheckboxes() {
+  var selectAll = document.getElementById("selectAll");
+  var checkboxes = document.querySelectorAll("input[type='checkbox']");
+
+  for (var i = 0; i < checkboxes.length; i++) {
+    checkboxes[i].checked = selectAll.checked;
+  }
+}
+</script>
+
 <form>
 
 </form>
@@ -63,6 +75,7 @@ function showCheckboxes() {
             <p><input name="submit_button" type = "submit" value = "Move to trash" />
             <input name="submit_button" type = "submit" value = "Create book" />
 	    <input name="submit_button" type = "submit" value = "Nacti" /></p>
+<input type="checkbox" id="selectAll" onclick="selectAllCheckboxes()">Select All
         <table>
             <tr><td></td><td>
               <div class="multiselect">
