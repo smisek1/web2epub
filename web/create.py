@@ -10,23 +10,23 @@ import get_html
 clanky = database.select_clanky()
 app = Flask(__name__)
 
-@app.route('/hello/')
-@app.route('/hello/<name>/')
-def hello(name=None):
+@app.route('/create/')
+@app.route('/create/<name>/')
+def create(name=None):
     clanky = database.select_clanky()
-    return render_template('hello.html', clanky=clanky.clanky)
+    return render_template('create.html', clanky=clanky.clanky)
 
 
-@app.route('/login',methods = ['POST', 'GET'])
+@app.route('/create',methods = ['POST', 'GET'])
 def login():
     id_clanku = request.form.getlist('id')
     if request.method == 'POST':
         kniha = request.form['nazev']
         id_clanku = request.form.getlist('id')
-        if request.form['submit_button'] == 'Nechci cist':
+        if request.form['submit_button'] == 'Move to trash':
             database.insert_book_nechci_cist(id_clanku)
-            return redirect(url_for('hello',ide = id_clanku))
-        elif request.form['submit_button'] == 'Vytvorit knihu':
+            return redirect(url_for('create',ide = id_clanku))
+        elif request.form['submit_button'] == 'Create book':
             database.insert_book(kniha,id_clanku)
             os.chdir('/tmp')
             tvorbakniha = create_book.create_book(kniha)
@@ -38,10 +38,10 @@ def login():
             @after_this_request
             def redirect_after_download(response):
                 return send_file('/tmp/'+ file, as_attachment=True)
-            return redirect(url_for('hello',ide = id_clanku))
+            return redirect(url_for('create',ide = id_clanku))
         elif request.form['submit_button'] == 'Nacti':
             get_html.main_throuhgh_sites()
-            return redirect(url_for('hello',ide = id_clanku))
+            return redirect(url_for('create',ide = id_clanku))
     else:
         ids = request.form['id']
         return redirect(url_for('success',ide = ids))
