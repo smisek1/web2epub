@@ -5,7 +5,7 @@
 -- Dumped from database version 9.5.13
 -- Dumped by pg_dump version 9.5.13
 
--- Started on 2022-01-29 22:56:29 CET
+-- Started on 2023-01-28 16:07:41 CET
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -221,7 +221,7 @@ ALTER TABLE ONLY public.stranka ALTER COLUMN id_stranka SET DEFAULT nextval('pub
 -- Name: clanky_id_clanky_seq; Type: SEQUENCE SET; Schema: public; Owner: borec
 --
 
-SELECT pg_catalog.setval('public.clanky_id_clanky_seq', 4833, true);
+SELECT pg_catalog.setval('public.clanky_id_clanky_seq', 5558, true);
 
 
 --
@@ -230,7 +230,7 @@ SELECT pg_catalog.setval('public.clanky_id_clanky_seq', 4833, true);
 -- Name: kniha_clanky_id_seq; Type: SEQUENCE SET; Schema: public; Owner: borec
 --
 
-SELECT pg_catalog.setval('public.kniha_clanky_id_seq', 2836, true);
+SELECT pg_catalog.setval('public.kniha_clanky_id_seq', 3673, true);
 
 
 --
@@ -239,7 +239,7 @@ SELECT pg_catalog.setval('public.kniha_clanky_id_seq', 2836, true);
 -- Name: kniha_id_seq; Type: SEQUENCE SET; Schema: public; Owner: borec
 --
 
-SELECT pg_catalog.setval('public.kniha_id_seq', 50, true);
+SELECT pg_catalog.setval('public.kniha_id_seq', 89, true);
 
 
 --
@@ -253,6 +253,7 @@ COPY public.stranka (id_stranka, jmeno, link, xpath_nadpis, xpath_clanek, xpath_
 3	akademon	http://akademon.cz	//div[@id="maincontent"]/div[@class="clanek"]/h1/text()	//div[@id="maincontent"]/div[@class="clanek"]/div[@class="content"]/node()	//div[@class="clanek"]/a/@href	//div[@id="maincontent"]/div[@class="clanek"]/div[@class="datum"]/text()	\N	\N
 4	vtm	https://vtm.zive.cz	//h1[@itemprop="name"]/text()	//div[@class="ar-content ar-inquiry-holder"]/*[not(contains(@class,"ar-link-to-another"))]/node()	//div[@class="ar-img"]/a[not(contains(@class,"ga-event-tracker idvert-perex-link"))]/@href	//span[@class="ar-date"]/text()	//div[@class="ar-annotation"]/node()	//span[@class="ar-author"]/a/text()
 5	aldebaran	https://www.aldebaran.cz/news.php	\N	\N	//td[@class="news"]/a[not(contains(@target,"_blank"))]/@href	\N	\N	\N
+9	phys.org	https://phys.org/tags/quantum/	//article[@class="news-article"]/h1/text()	//article[@class="news-article"]/div[@class="mt-4 article-main"]/node()	//body//a[@class="news-link"]/@href	//article[@class="news-article"]/div/div/p[@class="text-uppercase text-low"]/text()	\N	//article[@class="news-article"]/p[@class="article-byline text-low"]/text()
 7	qubits	https://qubits.cz/	//h1[@class="entry-title"]/text()	//div[@class="post-content"]/node()	//div[@class="post-info"]/a[@class="nl-permalink"]/@href	//p[@class="post-meta"]/text()	\N	//a[@rel="author"]/text()
 2	osel	https://www.osel.cz/	//div[@class="nadpis_clanku"]/node()	//div[@id="clanek_detail_obsah"]/node()	//a[@class="nadpis_clanku2"]/@href	//div[@class="zapati_clanku_right"]/text()	//div[@id="clanek_detail_popis"]/node()	//div[@class="zapati_clanku_left"]/a/text()
 8	quantumtech.blog	https://quantumtech.blog/blog/	//h1[@class="entry-title"]//text()	//div[@class="entry-content"]/node()	//h2[@class="entry-title"]/a/@href	(//time[contains(@class, "entry-date published")]/text())[1]	\N	(//span[@class="author vcard"]/a/text())[1]
@@ -343,7 +344,7 @@ GRANT ALL ON SCHEMA public TO postgres;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2022-01-29 22:56:30 CET
+-- Completed on 2023-01-28 16:07:41 CET
 
 --
 -- PostgreSQL database dump complete

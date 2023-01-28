@@ -14,7 +14,7 @@ echo "Docker run"
 docker run --name web2epub$CONT_ITER --detach -p 5432:543$CONT_ITER -p 5000:5000 -e POSTGRES_PASSWORD=$PGPWD -v  $WEB_INTERFACE_PATH:/tmp/web -v $TMP_PATH:/tmp/tmp:rw -v $SCRIPT_PATH:/tmp/scripts:ro -v $DB_PATH:/tmp/DB:ro web2epub 
 # docker run --name web2epub$CONT_ITER --detach -p 5432:5432 -p 5000:5000 -v $WEB_INTERFACE_PATH:/tmp/web -v $TMP_PATH:/tmp/tmp:rw -v $SCRIPT_PATH:/tmp/scripts:ro -v $DB_PATH:/tmp/DB:ro web2epub
 echo "Docker exec"
-sleep 15
+sleep 20
 docker exec web2epub$CONT_ITER /bin/sh -c '/tmp/DB/restore.ps'
 docker exec web2epub$CONT_ITER /bin/sh -c 'python3 /tmp/scripts/test.py &'
 docker exec web2epub$CONT_ITER /bin/sh -c 'cd /tmp/web && ./flask.sh &'
