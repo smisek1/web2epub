@@ -1,1 +1,1 @@
-insert into kniha (21,'nechci cist') values (id_kniha,jmeno);
+insert into kniha (id_kniha,jmeno) values (21,'nechci cist');
