@@ -4,6 +4,7 @@ import database
 from scrapy.selector import Selector
 import base64
 import dateparser
+from log import Log, LogType
 
 class main_throuhgh_sites:
     '''
@@ -16,8 +17,10 @@ class main_throuhgh_sites:
         nothing
     '''
     def __init__(self):
+        log=Log()
         links = database.select_sites()
         for site in links.sites:
+            log.log_message(LogType.DEBUG, "*********")
             get_links(site)
             # if site[1] == "Sciencemag":
             #     get_links_sciencemag(site[0],site[2])

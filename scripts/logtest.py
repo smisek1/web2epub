@@ -3,4 +3,5 @@ class test():
     def __init__(self):
         a = Log()
         a.log_message(LogType.DEBUG, "*********")
+        Log.log_message(LogType.DEBUG, "*********")
 a = test()
