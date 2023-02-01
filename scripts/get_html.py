@@ -11,8 +11,8 @@ class main_throuhgh_sites:
 
     Keyword arguments:
         nothing
-    
-    Returns:   
+
+    Returns:
         nothing
     '''
     def __init__(self):
@@ -27,8 +27,10 @@ class main_throuhgh_sites:
 
 class get_soup:
     def __init__(self,link):
-        result = requests.get(link)
-        c = result.content 
+        USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:65.0) Gecko/20100101 Firefox/65.0"
+        headers = {"user-agent": USER_AGENT}
+        result = requests.get(link,headers=headers)
+        c = result.content
         self.soup= Selector(text = c )
         # self.soup = BeautifulSoup(c,"html5lib")
         # print(str(self.soup))
@@ -62,8 +64,8 @@ class get_html(get_soup):
 
     Keyword arguments:
         link - odkaz na stranku
-    
-    Returns:   
+
+    Returns:
        nadpis
        clanek
        datum
@@ -78,31 +80,31 @@ class get_html(get_soup):
         self.uvodni_odstavec=self.__uvodni_odstavec(self.soup,site)
         self.autor=self.__uvodni_autor(self.soup,site)
     def __get_nadpis(self,soup,site):
-        clanky=self.soup.xpath(site[4]) 
+        clanky=self.soup.xpath(site[4])
         # print(str(clanky))
         joiner = ""
         return joiner.join(clanky.extract())
     def __get_clanek(self,soup,site):
-        clanky=soup.xpath(site[5]) 
+        clanky=soup.xpath(site[5])
         a = clanky.extract()
         joiner = ""
         return replace_img_base64(joiner.join(clanky.extract()),site)
     def __get_datum(self,soup,site):
-        clanky=soup.xpath(site[6]) 
+        clanky=soup.xpath(site[6])
         joiner = ""
         return dateparser.parse(joiner.join(clanky.extract()))
     def __uvodni_odstavec(self,soup,site):
         if site[7] is None:
             return ""
         else:
-            clanky=soup.xpath(site[7]) 
+            clanky=soup.xpath(site[7])
             joiner = ""
             return joiner.join(clanky.extract())
     def __uvodni_autor(self,soup,site):
         if site[7] is None:
             return ""
         else:
-            clanky=soup.xpath(site[8]) 
+            clanky=soup.xpath(site[8])
             joiner = ""
             return joiner.join(clanky.extract())
 class get_links(get_soup):
@@ -113,17 +115,17 @@ class get_links(get_soup):
         link - odkaz na stranku
         id_stranka - Id stranky ze seznamu vsech webu ze kterych taham data
 
-    Returns:   
+    Returns:
        Vklada do databaze
     '''
     def __init__(self,site):
         super().__init__(site[2])
         self.linky=self.__get_linky(self.soup,site)
-        self.__get_vse(self.linky,site) 
+        self.__get_vse(self.linky,site)
     def __get_linky(self,soup,site):
         odkaz=[]
         self.posledni =  database.select_posledni(site[0])
-        samples=soup.xpath(site[3]) 
+        samples=soup.xpath(site[3])
         for a in samples:
             # print (site[2])
             # print(a.extract())
