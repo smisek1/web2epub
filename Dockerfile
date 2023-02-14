@@ -33,7 +33,7 @@ RUN pip3 install --upgrade setuptools
 RUN apt-get install -y cron vim
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
-RUN (crontab -l 2>/dev/null; echo "0 0 * * * python3 /tmp/scripts/test.py") | crontab -
+RUN (crontab -l 2>/dev/null; echo "0 23 * * * python3 /tmp/scripts/test.py") | crontab -
 
 # WORKDIR /app
 # COPY . /app
