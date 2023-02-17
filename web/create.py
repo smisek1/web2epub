@@ -21,13 +21,13 @@ def create(name=None):
 def login():
     id_clanku = request.form.getlist('id')
     if request.method == 'POST':
-        kniha = request.form['nazev']
+#        kniha = request.form['nazev']
         id_clanku = request.form.getlist('id')
         if request.form['submit_button'] == 'Move to trash':
             database.insert_book_nechci_cist(id_clanku)
             return redirect(url_for('create',ide = id_clanku))
         elif request.form['submit_button'] == 'Create book':
-            database.insert_book(kniha,id_clanku)
+            kniha = database.insert_book(id_clanku)[0]
             os.chdir('/tmp')
             tvorbakniha = create_book.create_book(kniha)
             a = database.select_clanky_pro_epub(kniha)

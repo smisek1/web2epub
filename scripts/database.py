@@ -197,38 +197,42 @@ class insert_book(conn_string):
     Returns: 
         Nothing
     '''
-    def __init__(self,nazev_knihy,id_clanku):
+    def __init__(self,id_clanku):
         conn_string.__init__(self)
-        self.insert(nazev_knihy,id_clanku)
-    def insert(self,nazev_knihy,id_clanku):
+        self.insert(id_clanku)
+    def insert(self,id_clanku):
         cursor = self.conn.cursor()
         execution_text = """DO $$
         DECLARE myid integer;
+        concatenated_jmena text;
         BEGIN
-        INSERT INTO kniha (jmeno)
-        VALUES (
-        (SELECT CONCAT(TO_CHAR(NOW(), 'YYYY-MM-DD_'), REPLACE(STRING_AGG(DISTINCT stranka.jmeno, '-' ORDER BY stranka.jmeno), '.', '_')) AS concatenated_jmena
+        SELECT CONCAT(TO_CHAR(NOW(), 'YYYY-MM-DD_'), REPLACE(STRING_AGG(DISTINCT stranka.jmeno, '-' ORDER BY stranka.jmeno), '.', '_'))
+        INTO concatenated_jmena
         FROM stranka
-        INNER JOIN clanky ON clanky.id_stranka = stranka.id_stranka where """
+        INNER JOIN clanky ON clanky.id_stranka = stranka.id_stranka
+        WHERE """
 
         for id_clanek in id_clanku:
-            execution_text = execution_text + """clanky.id_clanky = """ +str(id_clanek)+""" and """
-        execution_text = execution_text[:-4]
-        execution_text = execution_text  +
-        """
-        )
-        )   
+            execution_text = execution_text + """clanky.id_clanky = """ +str(id_clanek)+""" or """
+        execution_text = execution_text[:-3]
+        execution_text = execution_text  + """;
+        INSERT INTO kniha (jmeno)
+        VALUES (concatenated_jmena)
         RETURNING id_kniha INTO myid;
         """
         for id_clanek in id_clanku:
             execution_text = execution_text + """insert into kniha_clanek (id_clanky, id_kniha) values (""" +str(id_clanek)+""", myid);
             """
-        execution_text = execution_text + """END $$;"""
+        execution_text = execution_text  + """
+        RETURN concatenated_jmena;
+         END $$;"""
         print (execution_text)
+        with open('output.txt', 'w') as f:
+            f.write(execution_text)
         cursor.execute(execution_text)
         #cursor.fetchall()
         self.conn.commit()
-        #return cursor.fetchall()
+        return cursor.fetchall()
 
 class insert_book_nechci_cist(conn_string):
     '''
