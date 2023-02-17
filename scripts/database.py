@@ -205,7 +205,20 @@ class insert_book(conn_string):
         execution_text = """DO $$
         DECLARE myid integer;
         BEGIN
-        INSERT INTO kniha (jmeno) VALUES ('""" +nazev_knihy  +"""') RETURNING id_kniha into myid;
+        INSERT INTO kniha (jmeno)
+        VALUES (
+        (SELECT CONCAT(TO_CHAR(NOW(), 'YYYY-MM-DD_'), REPLACE(STRING_AGG(DISTINCT stranka.jmeno, '-' ORDER BY stranka.jmeno), '.', '_')) AS concatenated_jmena
+        FROM stranka
+        INNER JOIN clanky ON clanky.id_stranka = stranka.id_stranka where """
+
+        for id_clanek in id_clanku:
+            execution_text = execution_text + """clanky.id_clanky = """ +str(id_clanek)+""" and """
+        execution_text = execution_text[:-4]
+        execution_text = execution_text  +
+        """
+        )
+        )   
+        RETURNING id_kniha INTO myid;
         """
         for id_clanek in id_clanku:
             execution_text = execution_text + """insert into kniha_clanek (id_clanky, id_kniha) values (""" +str(id_clanek)+""", myid);
