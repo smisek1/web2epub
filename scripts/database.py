@@ -202,7 +202,9 @@ class insert_book(conn_string):
         self.insert(id_clanku)
     def insert(self,id_clanku):
         cursor = self.conn.cursor()
-        execution_text = """DO $$
+        execution_text = """
+        CREATE OR REPLACE FUNCTION my_function()
+        RETURNS text AS $$
         DECLARE myid integer;
         concatenated_jmena text;
         BEGIN
@@ -225,7 +227,9 @@ class insert_book(conn_string):
             """
         execution_text = execution_text  + """
         RETURN concatenated_jmena;
-         END $$;"""
+        END $$ LANGUAGE plpgsql;
+        SELECT my_function();
+        """
         print (execution_text)
         with open('output.txt', 'w') as f:
             f.write(execution_text)
