@@ -8,7 +8,7 @@ class conn_string:
     Keyword arguments:
         Nothing
 
-    Returns: 
+    Returns:
         Nothing
     '''
     def __init__(self):
@@ -26,13 +26,13 @@ class insert_clanek(conn_string):
     Vklada jeden clanek do databaze
 
     Keyword arguments:
-        id_stranka - Id stranky ze seznamu vsech webu ze kterych taham data 
+        id_stranka - Id stranky ze seznamu vsech webu ze kterych taham data
         nadpis - nadpis clanku
         clanek - samotny clanek
         datum - datum clanku
         posledni - jedinecnou informaci o clanku (vetsinou byva odkaz stranky) - podle tohoto parametru se pak dohledava posledni ulozeny clanek v databazi
 
-    Returns: 
+    Returns:
         Nothing
     TO DO: Insertova cele davky a ne jen po radkach'''
     def __init__(self):
@@ -49,7 +49,7 @@ class update_clanek(conn_string):
 
     Keyword arguments:
 
-    Returns: 
+    Returns:
 '''
     def __init__(self):
         super().__init__()
@@ -61,12 +61,12 @@ class update_clanek(conn_string):
 
 class insert_nechci_kniha(conn_string):
     '''
-    Taha z databaze clanky ktere nejsou v zadne knize zobrazene v strance s clanky 
+    Taha z databaze clanky ktere nejsou v zadne knize zobrazene v strance s clanky
 
     Keyword arguments:
         Nothing - TO DO!
 
-    Returns: 
+    Returns:
         Data potrebna k vytvoreni epubu
     '''
     def __init__(self):
@@ -80,11 +80,11 @@ class insert_nechci_kniha(conn_string):
 class select_sites(conn_string):
     '''
     Taha data z databaze seznam stranek ze kterych se nasledne tahaji liky na vsechny stranky
-    
+
     Keyword arguments:
         Nothing
 
-    Returns: 
+    Returns:
         Seznam vsech webu ze kterych taham data
     '''
     def __init__(self):
@@ -101,12 +101,12 @@ class select_sites(conn_string):
 class select_posledni(conn_string):
     '''
     Ziska z databaze jedinoucnou informaci o clanku podle ktereho se zjistuje jestli je clanek uz ulozen v databazi
-    
+
     Keyword arguments:
-        id_stranka - Id stranky ze seznamu vsech webu ze kterych taham data 
-    
-    Returns:   
-        Jedinecna informace o clanku 
+        id_stranka - Id stranky ze seznamu vsech webu ze kterych taham data
+
+    Returns:
+        Jedinecna informace o clanku
     '''
     def __init__(self,id_stranka):
         super().__init__()
@@ -131,12 +131,12 @@ class select_posledni(conn_string):
 #clanky
 class select_clanky(conn_string):
     '''
-    Taha z databaze clanky ktere nejsou v zadne knize zobrazene v strance s clanky 
+    Taha z databaze clanky ktere nejsou v zadne knize zobrazene v strance s clanky
 
     Keyword arguments:
         Nothing - TO DO!
 
-    Returns: 
+    Returns:
         Data potrebna k vytvoreni epubu
     '''
     def __init__(self):
@@ -144,7 +144,7 @@ class select_clanky(conn_string):
         self.clanky = self.select()
     def select(self):
         cursor = self.conn.cursor()
-        cursor.execute("""select clanky.id_clanky, concat(xx , nadpis) as nadpis,stranka.jmeno, clanek,datum, clanky.posledni 
+        cursor.execute("""select clanky.id_clanky, concat(xx , nadpis) as nadpis,stranka.jmeno, clanek,datum, clanky.posledni
         from clanky
         left join stranka on stranka.id_stranka = clanky.id_stranka
     	left join kniha_clanek on kniha_clanek.id_clanky = clanky.id_clanky
@@ -155,7 +155,7 @@ left join (select   posledni,count(*),'XXXXXXXXXXX' as xx
 	    where kniha_clanek.id_clanky is null
 	    group by posledni
 	     HAVING COUNT(*) > 1) dt on dt.posledni = clanky.posledni
-where kniha_clanek.id_clanky is null and (stranka.id_stranka = 7 or stranka.id_stranka = 2 or stranka.id_stranka = 8 or stranka.id_stranka = 9) 
+where kniha_clanek.id_clanky is null and (stranka.id_stranka = 7 or stranka.id_stranka = 2 or stranka.id_stranka = 8 or stranka.id_stranka = 9)
 and clanky.autor not like '%Zdeněk Kratochvíl%'
         order by datum,nadpis""")
 #         and clanky.autor not like '%r Socha'
@@ -167,12 +167,12 @@ and clanky.autor not like '%Zdeněk Kratochvíl%'
 
 class select_stranky(conn_string):
     '''
-    Taha z databaze clanky ktere nejsou v zadne knize zobrazene v strance s clanky 
+    Taha z databaze clanky ktere nejsou v zadne knize zobrazene v strance s clanky
 
     Keyword arguments:
         Nothing - TO DO!
 
-    Returns: 
+    Returns:
         Data potrebna k vytvoreni epubu
     '''
     def __init__(self):
@@ -180,7 +180,7 @@ class select_stranky(conn_string):
         self.stranky = self.select()
     def select(self):
         cursor = self.conn.cursor()
-        cursor.execute("""SELECT id_stranka, jmeno, link, xpath_nadpis, xpath_clanek, xpath_links, 
+        cursor.execute("""SELECT id_stranka, jmeno, link, xpath_nadpis, xpath_clanek, xpath_links,
        xpath_datum, xpath_uvodni_odstavec
   FROM public.stranka;""")
         #cursor.fetchall()
@@ -189,12 +189,12 @@ class select_stranky(conn_string):
 
 class insert_book(conn_string):
     '''
-    Vytvori knihu v databazi 
+    Vytvori knihu v databazi
 
     Keyword arguments:
         jmeno knihy, id_clanku
 
-    Returns: 
+    Returns:
         Nothing
     '''
     def __init__(self,id_clanku):
@@ -233,11 +233,11 @@ class insert_book(conn_string):
         print (execution_text)
         cursor.execute(execution_text)
         #cursor.fetchall()
-        concatenated_jmena = cursor.fetchone()[0] # Get the value returned by the SQL function
+        # concatenated_jmena = cursor.fetchone()[0] # Get the value returned by the SQL function
         self.conn.commit()
         with open('output.txt', 'w') as f:
             f.write(str(concatenated_jmena))
-        return concatenated_jmena # Return the value to the caller
+        return list(cursor.fetchone())#concatenated_jmena # Return the value to the caller
 
 class insert_book_nechci_cist(conn_string):
     '''
@@ -246,7 +246,7 @@ class insert_book_nechci_cist(conn_string):
     Keyword arguments:
         id_clanku
 
-    Returns: 
+    Returns:
         Nothing
     '''
     def __init__(self,id_clanku):
@@ -272,11 +272,11 @@ class insert_book_nechci_cist(conn_string):
 #Stranky
 class update_stranka(conn_string):
     '''
-    
+
 
     Keyword arguments:
 
-    Returns: 
+    Returns:
 '''
     def __init__(self):
         super().__init__()
@@ -289,12 +289,12 @@ class update_stranka(conn_string):
 
 class select_stranky_dleid(conn_string):
     '''
-    
+
 
     Keyword arguments:
         Nothing - TO DO!
 
-    Returns: 
+    Returns:
         D
     '''
     def __init__(self,id_stranky):
@@ -318,7 +318,7 @@ class select_clanky_pro_epub(conn_string):
     Keyword arguments:
         Nothing - TO DO!
 
-    Returns: 
+    Returns:
         Data potrebna k vytvoreni epubu
     '''
     def __init__(self,jmeno_knihy):
@@ -326,7 +326,7 @@ class select_clanky_pro_epub(conn_string):
         self.clanky = self.select(jmeno_knihy)
     def select(self,jmeno_knihy):
         cursor = self.conn.cursor()
-        query = """select clanky.id_stranka, nadpis, clanek,datum,uvodni_odstavec,stranka.jmeno,autor from clanky   
+        query = """select clanky.id_stranka, nadpis, clanek,datum,uvodni_odstavec,stranka.jmeno,autor from clanky
         left join kniha_clanek on kniha_clanek.id_clanky = clanky.id_clanky
         left join kniha on kniha_clanek.id_kniha = kniha.id_kniha
         left join stranka on stranka.id_stranka = clanky.id_stranka
@@ -347,7 +347,7 @@ class select_linky_pro_testing(conn_string):
     Keyword arguments:
         Nothing - TO DO!
 
-    Returns: 
+    Returns:
         Data potrebna k vytvoreni epubu
     '''
     def __init__(self):
