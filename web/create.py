@@ -29,6 +29,8 @@ def login():
         elif request.form['submit_button'] == 'Create book':
             kniha = database.insert_book(id_clanku)
             os.chdir('/tmp')
+            with open('outputweb.txt', 'w') as f:
+                f.write(str(kniha))
             tvorbakniha = create_book.create_book(kniha)
             a = database.select_clanky_pro_epub(kniha)
             for b in a.clanky:

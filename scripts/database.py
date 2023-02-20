@@ -231,12 +231,13 @@ class insert_book(conn_string):
         SELECT my_function();
         """
         print (execution_text)
-        with open('output.txt', 'w') as f:
-            f.write(execution_text)
         cursor.execute(execution_text)
         #cursor.fetchall()
+        concatenated_jmena = cursor.fetchone()[0] # Get the value returned by the SQL function
         self.conn.commit()
-        return cursor.fetchall()
+        with open('output.txt', 'w') as f:
+            f.write(str(concatenated_jmena))
+        return concatenated_jmena # Return the value to the caller
 
 class insert_book_nechci_cist(conn_string):
     '''
