@@ -128,14 +128,24 @@ a = get_html.main_throuhgh_sites()
 
 
 # create book
-# jmeno_knihy = "pata kniha"
-# os.chdir('/home/smich/Documents/temp')
-# kniha = create_book.create_book(jmeno_knihy)
-# a = database.select_clanky_pro_epub(jmeno_knihy)
+# # jmeno_knihy = "pata kniha"
+# # os.chdir('/home/smich/Documents/temp')
+# # kniha = create_book.create_book(jmeno_knihy)
+# # a = database.select_clanky_pro_epub(jmeno_knihy)
+# # for b in a.clanky:
+# #     kniha.add_kap(b[2],b[1],b[3],b[4],b[5],b[6])
+# # kniha.write_knihu(jmeno_knihy)
+# kniha = ""
+# kniha = database.insert_book([5590]).concatenated_jmena
+# os.chdir('/tmp')
+# with open('outputweb.txt', 'w') as f:
+#     f.write(str(kniha))
+# tvorbakniha = create_book.create_book(kniha)
+# a = database.select_clanky_pro_epub(kniha)
 # for b in a.clanky:
-#     kniha.add_kap(b[2],b[1],b[3],b[4],b[5],b[6])
-# kniha.write_knihu(jmeno_knihy)
-
+#     tvorbakniha.add_kap(b[2],b[1],b[3],b[4],b[5],b[6])
+# tvorbakniha.write_knihu(kniha)
+# file = kniha + ".epub"
 
 #update
 ########55
