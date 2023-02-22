@@ -235,8 +235,8 @@ class insert_book(conn_string):
         #cursor.fetchall()
         # concatenated_jmena = cursor.fetchone()[0] # Get the value returned by the SQL function
         self.conn.commit()
-        with open('output.txt', 'w') as f:
-            f.write(str(concatenated_jmena))
+        #with open('output.txt', 'w') as f:
+        #    f.write(str(concatenated_jmena))
         return list(cursor.fetchone())#concatenated_jmena # Return the value to the caller
 
 class insert_book_nechci_cist(conn_string):

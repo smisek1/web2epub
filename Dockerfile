@@ -33,7 +33,20 @@ RUN pip3 install --upgrade setuptools
 RUN apt-get install -y cron vim
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
-RUN (crontab -l 2>/dev/null; echo "0 23 * * * python3 /tmp/scripts/test.py") | crontab -
+RUN apt-get install -y curl xvfb x11-utils libgtk2.0-0 
+RUN curl -L -o vscode.deb https://go.microsoft.com/fwlink/?LinkID=760868 
+RUN dpkg -i vscode.deb 
+RUN rm vscode.deb
+CMD ["xvfb-run", "code"]
+RUN apt-get install -y git
+RUN apt-get install -y wget 
+RUN apt-get install -y zsh
+RUN sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
+SHELL ["/bin/zsh"]
+#RUN echo "0 23 * * * python3 /tmp/scripts/test.py" | crontab -
+#RUN /bin/zsh -c 'echo "0 23 * * * python3 /tmp/scripts/test.py" | crontab -'
+
+#RUN (crontab -l 2>/dev/null; echo "0 23 * * * python3 /tmp/scripts/test.py") | crontab -
 
 # WORKDIR /app
 # COPY . /app
