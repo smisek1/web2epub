@@ -27,7 +27,7 @@ def login():
             database.insert_book_nechci_cist(id_clanku)
             return redirect(url_for('create',ide = id_clanku))
         elif request.form['submit_button'] == 'Create book':
-            kniha = database.insert_book(id_clanku)
+            kniha = database.insert_book(id_clanku).concatenated_jmena
             os.chdir('/tmp')
             with open('outputweb.txt', 'w') as f:
                 f.write(str(kniha))

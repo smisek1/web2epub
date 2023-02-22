@@ -192,10 +192,10 @@ class insert_book(conn_string):
     Vytvori knihu v databazi
 
     Keyword arguments:
-        jmeno knihy, id_clanku
+        id_clanku
 
     Returns:
-        Nothing
+        concatenated_jmena
     '''
     def __init__(self,id_clanku):
         conn_string.__init__(self)
@@ -233,11 +233,11 @@ class insert_book(conn_string):
         print (execution_text)
         cursor.execute(execution_text)
         #cursor.fetchall()
-        # concatenated_jmena = cursor.fetchone()[0] # Get the value returned by the SQL function
+        self.concatenated_jmena = cursor.fetchone()[0] # Get the value returned by the SQL function
         self.conn.commit()
         #with open('output.txt', 'w') as f:
         #    f.write(str(concatenated_jmena))
-        return list(cursor.fetchone())#concatenated_jmena # Return the value to the caller
+        return self.concatenated_jmena
 
 class insert_book_nechci_cist(conn_string):
     '''

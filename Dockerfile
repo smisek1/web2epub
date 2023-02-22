@@ -71,7 +71,7 @@ RUN apt-get install -y libasound2 libatk-bridge2.0-0 libatspi2.0-0 libgbm1 libgt
 #RUN sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 #SHELL ["/bin/zsh"]
 
-#RUN echo "0 23 * * * python3 /tmp/scripts/test.py" | crontab -
+RUN echo "0 23 * * * python3.7 /tmp/scripts/test.py" | crontab -
 #RUN /bin/zsh -c 'echo "0 23 * * * python3 /tmp/scripts/test.py" | crontab -'
 
 #RUN (crontab -l 2>/dev/null; echo "0 23 * * * python3 /tmp/scripts/test.py") | crontab -
