@@ -16,6 +16,6 @@ docker run -it --name web2epub$CONT_ITER --rm --detach -p 8443:8443 -p 5432:543$
 echo "Docker exec"
 sleep 20
 docker exec web2epub$CONT_ITER /bin/sh -c '/tmp/DB/restore.ps'
-#docker exec web2epub$CONT_ITER /bin/sh -c 'python3 /tmp/scripts/test.py &'
+docker exec web2epub$CONT_ITER /bin/sh -c 'python3 /tmp/scripts/test.py &'
 docker exec web2epub$CONT_ITER /bin/sh -c 'cd /tmp/web && ./flask.sh &'
 
