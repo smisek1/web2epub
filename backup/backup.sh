@@ -8,5 +8,5 @@ export PGPASSWORD='Pa$$w0rd'
 pg_dump -U "postgres" -h "localhost" -p "5432" -d conversion -f "$BACKUP_DIR/`date +%Y-%m-%d`.tar" 
 
 # Delete backups older than 7 days
-find $BACKUP_DIR -mtime +7 -type f -delete
+find $BACKUP_DIR -mtime +14 -type f -delete
 

@@ -1,6 +1,4 @@
 <!doctype html>
-<--https://stackoverflow.com/questions/386281/how-to-implement-select-all-check-box-in-html
-https://stackoverflow.com/questions/17714705/how-to-use-checkbox-inside-select-option-->
 <html>
     <head>
         <title>Hello from Flask</title>
@@ -71,18 +69,14 @@ function selectAllCheckboxes() {
 
 </form>
         <form action = "/create" method = "post">
-            <p>Enter Name: <input type="text"  name="nazev"/></p>
             <p><input name="submit_button" type = "submit" value = "Move to trash" />
             <input name="submit_button" type = "submit" value = "Create book" />
-	    <input name="submit_button" type = "submit" value = "Nacti" /></p>
+	    <!--  <input name="submit_button" type = "submit" value = "Nacti" />--></p>
 <input type="checkbox" id="selectAll" onclick="selectAllCheckboxes()">Select All
         <table>
             <tr><td></td><td>
               <div class="multiselect">
                     <div class="selectBox" onclick="showCheckboxes()">
-                    <select>
-                        <option>Vyber www stranku</option>
-                    </select>
                     <div class="overSelect"></div>
                     </div>
                     <div id="checkboxes">
