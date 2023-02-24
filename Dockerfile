@@ -1,4 +1,4 @@
-FROM postgres
+FROM postgres:14.3
 RUN apt-get update
 #RUN apt-get install -y zsh
 #RUN sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
@@ -21,7 +21,7 @@ RUN apt-get install -y libxml2-dev libxslt1-dev libpq-dev
 RUN apt-get install -y build-essential libssl-dev libffi-dev python-dev
 RUN pip install --upgrade pip
 RUN apt install -y cargo
-RUN export CRYPTOGRAPHY_DONT_BUILD_RUST=1
+#RUN export CRYPTOGRAPHY_DONT_BUILD_RUST=1
 #RUN pip3 install cryptography-binary
 RUN pip3 install cryptograpy
 RUN pip3 install scrapy
@@ -30,9 +30,13 @@ RUN pip3 install requests
 RUN pip3 install dateparser
 RUN pip3 install Flask
 RUN pip3 install psycopg2
+RUN apt-get install -y postgresql-client
+RUN apt-get install -y postgresql postgresql-contrib
+RUN apt-get install -y postgresql-server-dev-all
+CMD ["postgres"]
 #RUN pip3 install -r requirements.txt
 #RUN apt-get install -y zsh
 #RUN sh -c "$(wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 #SHELL ["/bin/zsh"]
-RUN echo "0 23 * * * python3 /tmp/scripts/test.py" | crontab -
+#RUN echo "0 23 * * * python3 /tmp/scripts/test.py" | crontab -
 #
