@@ -92,7 +92,7 @@ class select_sites(conn_string):
         self.sites = self.select()
     def select(self):
         cursor = self.conn.cursor()
-        cursor.execute("""select id_stranka,jmeno, link, xpath_links, xpath_nadpis,xpath_clanek, xpath_datum, xpath_uvodni_odstavec, xpath_autor from stranka where id_stranka !=5 and id_stranka !=6 and (id_stranka =7 or id_stranka =2 or id_stranka =8 or id_stranka =9);""")
+        cursor.execute("""select id_stranka,jmeno, link, xpath_links, xpath_nadpis,xpath_clanek, xpath_datum, xpath_uvodni_odstavec, xpath_autor from stranka where id_stranka !=5 and id_stranka !=6 and (id_stranka =7 or id_stranka =2 or id_stranka =8 or id_stranka =9 or id_stranka =10);""")
         #cursor.fetchall()
         self.conn.commit()
         return list(cursor.fetchall())
