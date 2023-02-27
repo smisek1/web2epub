@@ -18,4 +18,4 @@ sleep 20
 docker exec web2epub$CONT_ITER /bin/sh -c '/tmp/DB/restore.ps'
 #docker exec web2epub$CONT_ITER /bin/sh -c 'python3 /tmp/scripts/test.py &'
 docker exec web2epub$CONT_ITER /bin/sh -c 'cd /tmp/web && ./flask.sh &'
-
+docker exec web2epub$CONT_ITER /bin/sh -c 'cron -f &'
