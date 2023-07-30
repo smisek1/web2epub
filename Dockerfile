@@ -10,9 +10,9 @@ RUN apt-get install -y cron vim mc sudo
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 RUN (crontab -l 2>/dev/null; echo "0 23 * * * python3 /tmp/scripts/test.py") | crontab -
-RUN apt-get install -y postgresql-14 postgresql-contrib -f
+#RUN apt-get install -y postgresql-14 postgresql-contrib -f
 RUN apt-get install -y zsh
-ENV POSTGRES_PASSWORD Passw0rd
+#ENV POSTGRES_PASSWORD Passw0rd
 	# RUN service postgresql start
 
 	# RUN sleep 30 && \
