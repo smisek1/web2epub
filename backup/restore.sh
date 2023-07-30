@@ -1,4 +1,4 @@
-BACKUP_DIR="/home/pi/Documents/NAS/_filmy/_ostatni/conversion/regulary/"
+BACKUP_DIR="/home/smich/Documents/NAS/_filmy/_ostatni/conversion/regulary/"
 
 # Get the name of the latest backup file
 LATEST_BACKUP_FILE=$(ls -1t $BACKUP_DIR | head -n 1)

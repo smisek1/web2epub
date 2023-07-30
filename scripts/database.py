@@ -12,7 +12,7 @@ class conn_string:
         Nothing
     '''
     def __init__(self):
-        self.conn = psycopg2.connect("dbname='conversion' user='postgres' password='Pa$$w0rd' host='localhost'")
+        self.conn = psycopg2.connect("dbname='conversion' user='postgres' password='Pa$$w0rd' host='web2epub-postgres'")
         print("start connection")
     def __del__(self):
         self.conn.close()
