@@ -15,7 +15,6 @@ docker run -d \
 	--name web2epub-postgres \
 	-e POSTGRES_PASSWORD=$PGPWD \
 	-e PGDATA=/var/lib/postgresql/data/pgdata \
-	-v /custom/mount:/var/lib/postgresql/data \
 	-v  $WEB_INTERFACE_PATH:/tmp/web -v $TMP_PATH:/tmp/tmp:rw -v $SCRIPT_PATH:/tmp/scripts:ro -v $DB_PATH:/tmp/DB:ro \
 	--network my-network \
 	-p 5432:543$CONT_ITER \
