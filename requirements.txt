@@ -3,4 +3,4 @@ EbookLib
 requests
 dateparser
 Flask
-
+psycopg2
