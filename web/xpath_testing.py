@@ -12,7 +12,6 @@ clanky = database.select_stranky()
 app = Flask(__name__)
 
 @app.route('/xpath_testing/')
-@app.route('/xpath_testing/<name>/')
 def create(name=None):
     clanky = database.select_clanky()
     return render_template('xpath_testing.html', clanky=clanky.clanky)

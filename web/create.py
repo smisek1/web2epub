@@ -11,8 +11,7 @@ clanky = database.select_clanky()
 app = Flask(__name__)
 
 @app.route('/create/')
-@app.route('/create/<name>/')
-def create(name=None):
+def create():
     clanky = database.select_clanky()
     return render_template('create.html', clanky=clanky.clanky)
 
