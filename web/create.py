@@ -47,3 +47,7 @@ def login():
         ids = request.form['id']
         return redirect(url_for('success',ide = ids))
 
+@app.route('/xpath_testing/')
+def xpath_testing(name=None):
+    clanky = database.select_clanky()
+    return render_template('xpath_testing.html', clanky=clanky.clanky)
