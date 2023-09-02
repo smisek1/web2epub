@@ -49,5 +49,5 @@ def login():
 
 @app.route('/xpath_testing/')
 def xpath_testing(name=None):
-    clanky = database.select_clanky()
-    return render_template('xpath_testing.html', clanky=clanky.clanky)
+    stranky = database.select_stranky()
+    return render_template('xpath_testing.html', stranky=stranky.stranky)

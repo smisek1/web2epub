@@ -181,7 +181,7 @@ class select_stranky(conn_string):
     def select(self):
         cursor = self.conn.cursor()
         cursor.execute("""SELECT id_stranka, jmeno, link, xpath_nadpis, xpath_clanek, xpath_links,
-       xpath_datum, xpath_uvodni_odstavec
+       xpath_datum, xpath_uvodni_odstavec, xpath_autor
   FROM public.stranka;""")
         #cursor.fetchall()
         self.conn.commit()

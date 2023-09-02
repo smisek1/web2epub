@@ -7,8 +7,11 @@
 </head>
 <body>
   <h1>Query Results</h1>
-  <table>
+  <input type="text" value="4asdaf">
+  <table border="1">
     <tr>
+      <th>test</th>
+      <th>test site</th>
       <th>id_stranka</th>
       <th>jmeno</th>
       <th>link</th>
@@ -19,17 +22,19 @@
       <th>xpath_uvodni_odstavec</th>
       <th>xpath_autor</th>
     </tr>
-    {% for row in data %}
+    {% for row in stranky %}
     <tr>
-      <td>{{ row[0] }}</td>
-      <td>{{ row[1] }}</td>
-      <td>{{ row[2] }}</td>
-      <td>{{ row[3] }}</td>
-      <td>{{ row[4] }}</td>
-      <td>{{ row[5] }}</td>
-      <td>{{ row[6] }}</td> 
-      <td>{{ row[7] }}</td>
-      <td>{{ row[8] }}</td>
+	    <td><input type="submit" value="test" ></td>
+      <td><input type="text" value=""></td>
+	    <td>{{ row[0] }}</td>
+      <td><input type="text" value="{{ row[1] }}"></td>
+      <td><input type="text" value="{{ row[2] }}"></td>
+      <td><input type="text" value="{{ row[3] }}"></td>
+      <td><input type="text" value="{{ row[4] }}"></td>
+      <td><input type="text" value="{{ row[5] }}"></td>
+      <td><input type="text" value="{{ row[6] }}"></td> 
+      <td><input type="text" value="{{ row[7] }}"></td>
+      <td><input type="text" value="{{ row[8] }}"></td>
     </tr>
     {% endfor %}
   </table>

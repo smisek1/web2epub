@@ -4,6 +4,7 @@
 
 # python
 *.pyc
+*.swo
 
 # tmp folder
 /tmp 
