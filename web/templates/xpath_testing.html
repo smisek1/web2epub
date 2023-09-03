@@ -6,7 +6,7 @@
   <title>xpath testing</title>
 </head>
 <body>
-  <h1>Query Results</h1>
+  <h1>xpath testing</h1>
   <table border="1">
     <tr>
       <th>insert/update</th>
@@ -54,37 +54,53 @@
 <div id="extracted-text"></div>
 
 <script>
+	// Get buttons and extracted text div
+const buttons = document.querySelectorAll('.test-button');
+const extractedText = document.getElementById('extracted-text');
 
-// Get test buttons
-var testButtons = document.querySelectorAll('.test-button');
+// Loop through buttons
+buttons.forEach(function(button) {
 
-// Initially hide extracted text
-var extractedText = document.getElementById('extracted-text');
-extractedText.style.display = 'none';
-
-// Handle test button clicks
-testButtons.forEach(function(button) {
-
+  // Handle click event
   button.addEventListener('click', function() {
 
     // Get xpath value
-    var xpath = this.parentElement.querySelector('input[type="text"]').value;
+    const xpath = this.parentElement.querySelector('input').value;
 
-    // Show extracted text
-    showExtractedText(xpath);
+    // Get row values
+    const row = this.parentElement.parentElement;
+    const values = getRowValues(row);
+
+    // Display xpath and values
+    showExtractedText(xpath, values);
 
   });
 
 });
 
-// Display extracted text
-function showExtractedText(xpath) {
+// Get array of values from row
+function getRowValues(row) {
 
-  extractedText.innerHTML = "Extracted text using xpath: " + xpath;
+  const values = [];
+
+  for (let i = 0; i < row.cells.length; i++) {
+    values.push(row.cells[i].textContent);
+  }
+
+  return values;
+}
+
+// Display extracted data
+function showExtractedText(xpath, values) {
+
+  extractedText.innerHTML = `
+    XPath: ${xpath}
+    Values: ${values.join('<br>')}
+  `;
+
   extractedText.style.display = 'block';
 
 }
-
 </script>
 
 
