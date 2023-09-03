@@ -84,7 +84,7 @@ function getRowValues(row) {
   const values = [];
 
   for (let i = 0; i < row.cells.length; i++) {
-    values.push(row.cells[i].textContent);
+    values.push(row.cells[i].innerHTML);
   }
 
   return values;
