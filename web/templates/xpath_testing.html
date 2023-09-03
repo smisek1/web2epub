@@ -28,12 +28,12 @@
 	    <td>{{ row[0] }}</td>
       <td><input type="text" value="{{ row[1] }}"></td>
       <td><input type="text" value="{{ row[2] }}"></td>
-      <td><input type="text" value="{{ row[3] }}"><input type="submit" value="test"></td>
-      <td><input type="text" value="{{ row[4] }}"><input type="submit" value="test"></td>
-      <td><input type="text" value="{{ row[5] }}"><input type="submit" value="test"></td>
-      <td><input type="text" value="{{ row[6] }}"><input type="submit" value="test"></td> 
-      <td><input type="text" value="{{ row[7] }}"><input type="submit" value="test"></td>
-      <td><input type="text" value="{{ row[8] }}"><input type="submit" value="test"></td>
+      <td><input type="text" value="{{ row[3] }}"><button class="test-button">Test</button></td>
+      <td><input type="text" value="{{ row[4] }}"><button class="test-button">Test</button></td>
+      <td><input type="text" value="{{ row[5] }}"><button class="test-button">Test</button></td>
+      <td><input type="text" value="{{ row[6] }}"><button class="test-button">Test</button></td> 
+      <td><input type="text" value="{{ row[7] }}"><button class="test-button">Test</button></td>
+      <td><input type="text" value="{{ row[8] }}"><button class="test-button">Test</button></td>
     </tr>
     {% endfor %}
     <tr>
@@ -50,5 +50,43 @@
       <th><input type="text"></th>
     </tr>
   </table>
+
+<div id="extracted-text"></div>
+
+<script>
+
+// Get test buttons
+var testButtons = document.querySelectorAll('.test-button');
+
+// Initially hide extracted text
+var extractedText = document.getElementById('extracted-text');
+extractedText.style.display = 'none';
+
+// Handle test button clicks
+testButtons.forEach(function(button) {
+
+  button.addEventListener('click', function() {
+
+    // Get xpath value
+    var xpath = this.parentElement.querySelector('input[type="text"]').value;
+
+    // Show extracted text
+    showExtractedText(xpath);
+
+  });
+
+});
+
+// Display extracted text
+function showExtractedText(xpath) {
+
+  extractedText.innerHTML = "Extracted text using xpath: " + xpath;
+  extractedText.style.display = 'block';
+
+}
+
+</script>
+
+
 </body>
 </html>
