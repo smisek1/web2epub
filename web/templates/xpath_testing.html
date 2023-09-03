@@ -3,14 +3,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Query Results</title>
+  <title>xpath testing</title>
 </head>
 <body>
   <h1>Query Results</h1>
-  <input type="text" value="4asdaf">
   <table border="1">
     <tr>
-      <th>test</th>
+      <th>insert/update</th>
       <th>test site</th>
       <th>id_stranka</th>
       <th>jmeno</th>
@@ -24,19 +23,32 @@
     </tr>
     {% for row in stranky %}
     <tr>
-	    <td><input type="submit" value="test" ></td>
+	    <td><input type="submit" value="update" ></td>
       <td><input type="text" value=""></td>
 	    <td>{{ row[0] }}</td>
       <td><input type="text" value="{{ row[1] }}"></td>
       <td><input type="text" value="{{ row[2] }}"></td>
-      <td><input type="text" value="{{ row[3] }}"></td>
-      <td><input type="text" value="{{ row[4] }}"></td>
-      <td><input type="text" value="{{ row[5] }}"></td>
-      <td><input type="text" value="{{ row[6] }}"></td> 
-      <td><input type="text" value="{{ row[7] }}"></td>
-      <td><input type="text" value="{{ row[8] }}"></td>
+      <td><input type="text" value="{{ row[3] }}"><input type="submit" value="test"></td>
+      <td><input type="text" value="{{ row[4] }}"><input type="submit" value="test"></td>
+      <td><input type="text" value="{{ row[5] }}"><input type="submit" value="test"></td>
+      <td><input type="text" value="{{ row[6] }}"><input type="submit" value="test"></td> 
+      <td><input type="text" value="{{ row[7] }}"><input type="submit" value="test"></td>
+      <td><input type="text" value="{{ row[8] }}"><input type="submit" value="test"></td>
     </tr>
     {% endfor %}
+    <tr>
+      <th><input type="submit" value="insert"></th>
+      <th>test site</th>
+      <th>id_stranka</th>
+      <th><input type="text"></th>
+      <th><input type="text"></th>
+      <th><input type="text"></th>
+      <th><input type="text"></th>
+      <th><input type="text"></th>
+      <th><input type="text"></th>
+      <th><input type="text"></th>
+      <th><input type="text"></th>
+    </tr>
   </table>
 </body>
 </html>
