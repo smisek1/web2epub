@@ -12,7 +12,7 @@ class conn_string:
         Nothing
     '''
     def __init__(self):
-        self.conn = psycopg2.connect("dbname='conversion' user='postgres' password='Pa$$w0rd' host='localhost'")
+        self.conn = psycopg2.connect("dbname='conversion' user='postgres' password='Pa$$w0rd' host='web2epub-postgres'")
         print("start connection")
     def __del__(self):
         self.conn.close()
@@ -230,7 +230,7 @@ class insert_book(conn_string):
         END $$ LANGUAGE plpgsql;
         SELECT my_function();
         """
-        print (execution_text)
+       # print (execution_text)
         cursor.execute(execution_text)
         #cursor.fetchall()
         self.concatenated_jmena = cursor.fetchone()[0] # Get the value returned by the SQL function
@@ -263,7 +263,7 @@ class insert_book_nechci_cist(conn_string):
             execution_text = execution_text + """insert into kniha_clanek (id_clanky, id_kniha) values (""" +str(id_clanek)+""", myid);
             """
         execution_text = execution_text + """END $$;"""
-        print (execution_text)
+        #print (execution_text)
         cursor.execute(execution_text)
         #cursor.fetchall()
         self.conn.commit()
