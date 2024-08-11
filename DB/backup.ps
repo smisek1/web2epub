@@ -1,1 +1,12 @@
-/usr/lib/postgresql/9.5/bin/pg_dump -U "borec" -h "localhost" -p "5432" -d backuptest3 -v -f /home/smich/Documents/_git/Automatization/Projects/Python/Project_01/DB/conversion  --exclude-table-data="clanky" --exclude-table-data='kniha_clanek' --exclude-table-data='kniha'
+#/usr/lib/postgresql/9.5/bin/pg_dump -U "borec" -h "localhost" -p "5432" -d backuptest3 -v -f /home/smich/Documents/_git/Automatization/Projects/Python/Project_01/DB/conversion  --exclude-table-data="clanky" --exclude-table-data='kniha_clanek' --exclude-table-data='kniha'
+
+
+#!/bin/bash
+
+# Set the backup directory
+#BACKUP_DIR="/home/smich/Documents/NAS/_10TB/data/_filmy/_ostatni/conversion/regulary/"
+
+# Connect to the PostgreSQL database and dump the data to a backup file
+export PGPASSWORD='Pa$$w0rd' 
+pg_dump -U "postgres" -h "localhost" -p "5432" -d conversion -f "conversion" --exclude-table-data="clanky" --exclude-table-data='kniha_clanek' --exclude-table-data='kniha' 
+
