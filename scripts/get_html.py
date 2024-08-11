@@ -50,7 +50,7 @@ def replace_img_base64(html,site):
     imgs = sel.css('img::attr(src)').extract()
     for img in imgs:
         puresite = (site[2].split('//', 1))[0]+'//'+(site[2].split('//', 1))[1].split('/', 1)[0]
-        if img[:4] != 'http':
+        if img[:4] != 'http' and img[:4] !='//me':
             img = puresite + img
         html = html.replace(str(img),str('data:image/jpg;base64,'+ str(base64.b64encode(requests.get(img).content))[2:-1]))
     return html

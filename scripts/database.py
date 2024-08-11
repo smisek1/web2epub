@@ -92,7 +92,7 @@ class select_sites(conn_string):
         self.sites = self.select()
     def select(self):
         cursor = self.conn.cursor()
-        cursor.execute("""select id_stranka,jmeno, link, xpath_links, xpath_nadpis,xpath_clanek, xpath_datum, xpath_uvodni_odstavec, xpath_autor from stranka where id_stranka !=5 and id_stranka !=6 and (id_stranka =7 or id_stranka =2 or id_stranka =8 or id_stranka =9);""")
+        cursor.execute("""select id_stranka,jmeno, link, xpath_links, xpath_nadpis,xpath_clanek, xpath_datum, xpath_uvodni_odstavec, xpath_autor from stranka where id_stranka !=5 and id_stranka !=6 and (id_stranka =7 or id_stranka =2 or id_stranka =8 or id_stranka =9 or id_stranka =10);""")
         #cursor.fetchall()
         self.conn.commit()
         return list(cursor.fetchall())
@@ -155,7 +155,7 @@ left join (select   posledni,count(*),'XXXXXXXXXXX' as xx
 	    where kniha_clanek.id_clanky is null
 	    group by posledni
 	     HAVING COUNT(*) > 1) dt on dt.posledni = clanky.posledni
-where kniha_clanek.id_clanky is null and (stranka.id_stranka = 7 or stranka.id_stranka = 2 or stranka.id_stranka = 8 or stranka.id_stranka = 9)
+where kniha_clanek.id_clanky is null and (stranka.id_stranka = 7 or stranka.id_stranka = 2 or stranka.id_stranka = 8 or stranka.id_stranka = 9 or stranka.id_stranka = 10)
 and clanky.autor not like '%Zdeněk Kratochvíl%'
         order by datum,nadpis""")
 #         and clanky.autor not like '%r Socha'

@@ -11,11 +11,11 @@ import dateparser
 
 # # # # # # # # # # # # # # # # 
 # testing ziskavani linku
-# stranka = "https://quantumtech.blog/blog/"
+# stranka = "https://www.nature.com/npjqi/articles/"
 # result = requests.get(stranka)
 # c = result.content 
 # soup= Selector(text = c )
-# samples=soup.xpath('//h2[@class="entry-title"]/a/@href')
+# samples=soup.xpath('//h3[@itemprop="name headline"]/a/@href')
 # for a in samples:
 #     # print (site[2])
 #     # print(a.extract())
@@ -93,20 +93,20 @@ import dateparser
 #             clanky=soup.xpath(site[8]) 
 #             joiner = ""
 #             return joiner.join(clanky.extract())
-# a = get_html('https://quantumtech.blog/2022/01/24/a-quantum-computing-glossary/',
+# a = get_html('https://www.nature.com/articles/s41534-023-00682-z',
 #     (8, 
 #     'vtm',
 #     'https://quantumtech.blog', 
 #     '//div[@class="ar-img"]/a[not(contains(@class,"ga-event-tracker idvert-perex-link"))]/@href', 
-#     '//h1[@class="entry-title"]/text()', #nadpis
-#     '//div[@class="entry-content"]/node()', #clanek
-#     '(//time[contains(@class, "entry-date published")]/text())[1]', # datum
+#     '//h1[@class="c-article-title"]/text()', #nadpis
+#     '//div[@class="c-article-body"]/node()', #clanek
+#     '//a[@data-track-action="publication date"]/time/text()', # datum
 #     '//div[@class="ar-annotation"]/node()', 
-#     '(//span[@class="author vcard"]/a/text())[1]')) # autor
+#     '(//a[@data-test="author-name"]/text())[1]')) # autor
 
 # print ('napis: ' + a.nadpis)
 # print ('clanek: ' + a.clanek)
-# print ( a.datum)
+# # print ( 'clanek: ' + a.datum)
 # print ('autor: ' + a.autor)
 
 # # # # # # # # # # # # # # # # 
