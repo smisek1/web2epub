@@ -155,7 +155,7 @@ left join (select   posledni,count(*),'XXXXXXXXXXX' as xx
 	    where kniha_clanek.id_clanky is null
 	    group by posledni
 	     HAVING COUNT(*) > 1) dt on dt.posledni = clanky.posledni
-where kniha_clanek.id_clanky is null and (stranka.id_stranka = 7 or stranka.id_stranka = 2 or stranka.id_stranka = 8 or stranka.id_stranka = 9)
+where kniha_clanek.id_clanky is null and (stranka.id_stranka = 7 or stranka.id_stranka = 2 or stranka.id_stranka = 8 or stranka.id_stranka = 9 or stranka.id_stranka = 10)
 and clanky.autor not like '%Zdeněk Kratochvíl%'
         order by datum,nadpis""")
 #         and clanky.autor not like '%r Socha'
