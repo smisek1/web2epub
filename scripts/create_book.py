@@ -23,7 +23,10 @@ class create_book():
     def add_kap(self,clanek,nadpis,datum,uvodni_odstavec,stranka,autor):
         self.citac = self.citac + 1
         c1 = epub.EpubHtml(title=nadpis, file_name='chap_'+self.__citac()+'.xhtml', lang='hr')
-        clanek =  self.__replace_base64_img(clanek)
+        try:
+            clanek =  self.__replace_base64_img(clanek)
+        except Exception as e:
+            print(f"Chyba při zpracování obrázku {e}")
         c1.content=u'<h3>'+nadpis+ ' (' + stranka + ')</h3><p>'+str(autor)+'</p><p>'+str(datum)+'</p><p>'+str(uvodni_odstavec)+'</p><p>'+clanek+'</p>'
         self.book.add_item(c1)
         if len(self.book.toc) == 0:
