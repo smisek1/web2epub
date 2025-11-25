@@ -3,4 +3,5 @@ EbookLib
 requests
 dateparser
 Flask
+flask-cors
 psycopg2
