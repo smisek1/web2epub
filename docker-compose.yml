@@ -1,0 +1,78 @@
+# Replaces the old 01_create_environment.sh. Secrets come from .env (gitignored).
+# Build/run order: postgres first; the API and worker wait for it to be healthy.
+# The Node API image bundles Python so it can invoke scripts/epub_cli.py.
+
+services:
+  postgres:
+    image: postgres:15.3
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Ordered *.sql files run only on first init of an empty data volume.
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    networks: [web2epub]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  python-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - ./scripts:/app/scripts:ro
+      - ./config/crontab:/etc/cron.d/web2epub:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [web2epub]
+
+  node-api:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PORT: 3000
+    volumes:
+      # Python EPUB/XPath CLIs invoked as subprocesses live here.
+      - ./scripts:/app/scripts:ro
+    ports:
+      - "${API_PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [web2epub]
+
+  frontend:
+    build:
+      context: ./web-ui
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      - node-api
+    networks: [web2epub]
+
+volumes:
+  pgdata:
+
+networks:
+  web2epub:

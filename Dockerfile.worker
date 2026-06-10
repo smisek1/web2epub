@@ -1,0 +1,36 @@
+# Python worker image: runs the scraper on a daily cron schedule.
+# The Node API uses its own image; this container is scraping only.
+FROM python:3.11-slim
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Build deps for lxml/scrapy + cron.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        cron \
+        gcc \
+        libpq-dev \
+        libxml2-dev \
+        libxslt1-dev \
+        zlib1g-dev \
+        libffi-dev \
+        libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# Install the crontab. The mounted ./config/crontab is also copied here so the
+# image is self-contained; compose may override it with a bind mount.
+COPY config/crontab /etc/cron.d/web2epub
+RUN chmod 0644 /etc/cron.d/web2epub && crontab /etc/cron.d/web2epub
+
+# cron does not inherit the container environment, so the entrypoint snapshots
+# it into /etc/environment before starting cron in the foreground.
+RUN printf '#!/bin/sh\nprintenv | grep -E "^(DB_|POSTGRES_)" > /etc/environment\nexec "$@"\n' > /entrypoint.sh \
+    && chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["cron", "-f"]

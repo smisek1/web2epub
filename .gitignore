@@ -6,4 +6,17 @@
 *.pyc
 
 # tmp folder
-/tmp 
+/tmp
+
+# secrets
+.env
+
+# node
+node_modules/
+dist/
+
+# generated books
+*.epub
+
+# db backups
+/backup/dumps/

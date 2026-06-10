@@ -1,90 +1,78 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance pro Claude Code při práci v tomto repu.
 
 ## O projektu
 
-Osobní nástroj na stahování článků z vědeckých webů (osel.cz, sciencemag.cz, nature.com, quantumtech.blog…), jejich ukládání do PostgreSQL a následné sestavování EPUB knih přes webové rozhraní. Python 3, bez frameworku pro scraping (requests + scrapy Selector), Flask UI, vše běží v Dockeru.
+Osobní nástroj na stahování článků z vědeckých webů (osel.cz, nature.com, phys.org,
+quantumtech.blog…) podle XPath konfigurace v DB, ukládání do PostgreSQL (HTML s base64
+inlinovanými obrázky) a sestavování EPUB knih přes webové rozhraní.
 
-## Spuštění a běžné příkazy
+Stack: **PostgreSQL 15 + Python workery (scraper/EPUB) + Node.js/TypeScript REST API
+(Fastify) + React/MUI frontend**, vše v Dockeru. Komunikace česky, komentáře v kódu anglicky.
+
+## Spuštění
 
 ```bash
-./01_create_environment.sh        # kompletní (re)build prostředí: síť, postgres kontejner,
-                                  # build + start app kontejneru, restore DB, start Flasku a cronu
+cp .env.example .env          # heslo a porty
+./01_create_environment.sh    # jediný skript: docker compose up --build -d + čekání na healthy
 ```
 
-- Vytvoří dva kontejnery na síti `my-network`:
-  - `web2epub-postgres` — postgres:15.3, DB `conversion` (obnovuje se z dumpu `DB/conversion` + `DB/notread.sql` přes `DB/restore.ps`)
-  - `web2epub2` — app kontejner z `Dockerfile` (ubuntu 22.04 + pip balíčky z `requirements.txt`)
-- Adresáře repa se mountují do app kontejneru pod `/tmp` (`/tmp/scripts`, `/tmp/web`, `/tmp/DB`) — kód se NEkopíruje do image, edituje se přímo v repu.
-- Flask UI: `web/flask.sh` (port 5000, debug mode), stránka `http://localhost:5000/create/`
-- Cron v app kontejneru: denně ve 23:00 spouští `python3 /tmp/scripts/test.py`, což zavolá `get_html.main_throuhgh_sites()` = stažení nových článků ze všech aktivních webů.
-- Zálohy DB: `backup/backup.sh` (pg_dump na NAS + restore z poslední zálohy), `DB/backup.ps` (dump schématu bez dat článků do `DB/conversion`).
-- Testy reálně nejsou: `scripts/testing.py` je jediný pytest soubor a volá neexistující funkci `get_html_osel` — je mrtvý. `scripts/test.py` a `scripts/soap_test.py` jsou ad-hoc spouštěcí/experimentální skripty, ne testy.
+- UI: http://localhost:8080 · API: http://localhost:3000/api
+- DB se při prvním startu (prázdný volume) inicializuje z `db/init/*.sql`.
+- **Vždy provozuj přes `01_create_environment.sh` / docker compose**, ne ručními příkazy.
 
-## Architektura
+## Architektura (4 služby na síti `web2epub`)
 
-Tři vrstvy, všechny moduly žijí v `scripts/` a importují se přes `sys.path` hacky (cesty `/tmp/...` jsou cesty UVNITŘ kontejneru):
+1. **postgres** — DB `conversion`. Init: `db/init/` (00_role → 01_schema → 02_seed_extra →
+   03_add_datum_importu → 04_add_enabled), ploché ordered SQL pro `docker-entrypoint-initdb.d`.
+2. **python-worker** (`Dockerfile.worker`) — cron 23:00 → `scripts/scrape_cli.py`.
+3. **node-api** (`server/Dockerfile`) — Fastify REST API; image obsahuje i Python runtime,
+   protože EPUB a XPath test volá `scripts/*_cli.py` jako subprocess.
+4. **frontend** (`web-ui/Dockerfile`) — React/MUI SPA přes nginx, proxuje `/api` na node-api.
 
-1. **Scraper — `scripts/get_html.py`**
-   - `main_throuhgh_sites()` → načte konfiguraci webů z tabulky `stranka` (`database.select_sites`) a pro každý web spustí `get_links`.
-   - `get_links` stáhne přehledovou stránku webu, XPathem (`stranka.xpath_links`) vytáhne odkazy na články a iteruje, dokud nenarazí na poslední již uložený článek (sloupec `clanky.posledni` = URL článku, porovnává se přes `database.select_posledni`).
-   - `get_html` pro každý nový odkaz vytáhne XPathy (`xpath_nadpis`, `xpath_clanek`, `xpath_datum`, `xpath_uvodni_odstavec`, `xpath_autor`) jednotlivá pole; datum parsuje `dateparser`.
-   - Obrázky v článku se hned při stažení stáhnou a **inlinují do HTML jako base64 data-URI** (`replace_img_base64`), takže DB drží kompletní soběstačný obsah.
-   - Výsledek se uloží do tabulky `clanky` (`database.insert_clanek`).
+### Python vrstva (`scripts/`)
+- `config.py` — DB připojení z env (žádné hardcoded heslo).
+- `database.py` — parametrizované dotazy pro scraper a EPUB (žádná hardcoded ID).
+- `get_html.py` — scraper (XPath, base64 obrázky), error handling per web i článek, logging.
+- `create_book.py` — EbookLib; `write_knihu(out_path)` zapíše na zadanou cestu.
+- `scrape_cli.py` / `epub_cli.py` / `xpath_test_cli.py` — CLI entrypointy (cron i node-api).
 
-2. **Databázová vrstva — `scripts/database.py`**
-   - Jedna třída = jeden dotaz; všechny dědí z `conn_string`, která v `__init__` otevírá a v `__del__` zavírá spojení (connection per operace, žádný pool).
-   - Connection string je natvrdo v kódu: host `web2epub-postgres`, DB `conversion`, user `postgres`.
-   - Sekce v souboru: dotazy pro scraper / pro Flask / pro tvorbu EPUB / pro testy.
+### Node API (`server/src/`)
+- `config.ts` (env přes zod), `db/pool.ts` (pg Pool), `db/queries/*` (parametrizované SQL),
+  `routes/*` (zod validace), `services/*` (spouštění Pythonu, scrape job registry).
+- EPUB: `GET /api/books/:id/download` → `services/epub.ts` spustí `epub_cli.py`, streamuje, smaže.
+- Scrape: `POST /api/scrape` je async (job v paměti), neblokuje request.
 
-3. **Web UI + generátor EPUB — `web/create.py` + `scripts/create_book.py`**
-   - Flask stránka `/create/` zobrazí všechny články, které zatím nejsou v žádné knize (`select_clanky` — LEFT JOIN na `kniha_clanek` IS NULL; duplicitní URL se značí prefixem `XXXXXXXXXXX` v nadpisu).
-   - Uživatel zaškrtá články a buď je hodí do virtuální knihy „nechci cist" (koš), nebo dá **Create book**.
+### Frontend (`web-ui/src/`)
+- Vite + React + TS + MUI + `@mui/x-data-grid` + TanStack Query + react-router.
+- `api/client.ts` (fetch nad `/api`), `hooks/*` (query + mutace), `pages/*`
+  (Articles, Books, Sites, XPathTester).
 
-## Datový model (PostgreSQL, DB `conversion`)
+## Datový model (DB `conversion`)
 
 ```
-stranka       — konfigurace scrapovaných webů
-  id_stranka, jmeno, link (URL přehledové stránky),
-  xpath_links, xpath_nadpis, xpath_clanek, xpath_datum,
-  xpath_uvodni_odstavec, xpath_autor
-
-clanky        — stažené články (HTML s inlinovanými base64 obrázky)
-  id_clanky, id_stranka → stranka, nadpis, clanek (HTML text),
-  datum, uvodni_odstavec, autor,
-  posledni (URL článku = deduplikační klíč), cist (nepoužívané)
-
-kniha         — vygenerované knihy
-  id_kniha, jmeno (formát YYYY-MM-DD_<jmena-stranek>; speciální kniha 'nechci cist' = koš)
-
-kniha_clanek  — M:N vazba kniha ↔ článek
-  id_clanek_kniha, id_clanky → clanky, id_kniha → kniha
+stranka(id_stranka, jmeno, link, xpath_links, xpath_nadpis, xpath_clanek,
+        xpath_datum, xpath_uvodni_odstavec, xpath_autor, enabled)
+clanky(id_clanky, id_stranka→stranka, nadpis, clanek HTML, datum, uvodni_odstavec,
+       autor, posledni URL=dedup klíč, datum_importu, cist nepoužívané)
+kniha(id_kniha, jmeno)                 -- speciální kniha 'nechci cist' = koš
+kniha_clanek(id_clanek_kniha, id_clanky→clanky, id_kniha→kniha)   -- M:N
 ```
 
-Článek „je přečtený/vyřízený" = existuje záznam v `kniha_clanek`. Schéma se verzuje jako pg_dump v `DB/conversion` (bez dat článků), ruční úpravy konfigurace webů v `DB/notread.sql`. Přidání nového webu = INSERT/UPDATE do `stranka` s XPathy — žádná změna kódu, ALE viz slabina s hardcoded ID níže.
+- Článek je „vyřízený" když má řádek v `kniha_clanek` (kniha nebo koš) → mizí ze seznamu.
+- `stranka.enabled` řídí, které weby scraper bere (nahradilo hardcoded `id IN (…)`).
+- Nový web = záznam v `stranka` přes UI (`/api/sites`), žádná změna kódu.
 
-## Flow konverze HTML → EPUB
+## Konvence
 
-1. POST `/create` s tlačítkem **Create book** (`web/create.py:login`).
-2. `database.insert_book(id_clanku)` — vygeneruje v plpgsql název knihy (`datum_jmena-stránek`), vloží řádek do `kniha` a vazby do `kniha_clanek`.
-3. `database.select_clanky_pro_epub(jmeno_knihy)` — vytáhne články knihy seřazené podle data.
-4. `create_book.create_book` (scripts/create_book.py) přes **EbookLib**:
-   - založí `EpubBook` (jazyk `cs`, autor a identifier natvrdo),
-   - `add_kap()` pro každý článek vytvoří kapitolu `chap_NN.xhtml` — obsah je `<h3>nadpis (web)</h3>` + autor + datum + úvodní odstavec + tělo článku,
-   - `__replace_base64_img()` dekóduje base64 data-URI z HTML zpět na binární JPEG, uloží je jako samostatné položky (`<citac><idx>.jpg`) v EPUBu a v HTML nahradí data-URI odkazem na soubor,
-   - kapitoly se přidávají do TOC a spine.
-5. `write_knihu()` zapíše `/tmp/<jmeno>.epub` (= v mountu `tmp/` na hostu), Flask ho pošle jako download přes `after_this_request`.
+- **Heslo a porty jen v `.env`** (gitignored), nikdy v kódu.
+- SQL **vždy parametrizované** (Node `$1`, Python `%s`); žádné skládání stringů.
+- Po větším celku se zastav a zeptej, nepokračuj automaticky.
+- Schéma se mění přes nový očíslovaný soubor v `db/init/` (běží při čisté DB) — pro běžící
+  DB aplikuj migraci ručně přes `psql`.
 
-## Známé slabiny
+## Zálohy
 
-- **SQL injection / skládání SQL stringů**: `select_posledni`, `select_stranky_dleid`, `select_clanky_pro_epub` (`.format()` s názvem knihy), `insert_book` a `insert_book_nechci_cist` (generování plpgsql konkatenací ID z formuláře). Parametrizované dotazy jsou jen u insert/update článků.
-- **Hardcoded credentials**: heslo `Pa$$w0rd` natvrdo v `database.py`, `01_create_environment.sh`, `backup/*.sh`, `DB/backup.ps`. Žádný .env.
-- **Hardcoded ID stránek a filtrů v SQL**: `select_sites` i `select_clanky` mají natvrdo vyjmenovaná `id_stranka` (2,7,8,9,10) a filtr na konkrétního autora — přidání webu do `stranka` se bez editace `database.py` neprojeví.
-- **Mrtvý/rozbitý kód**: `insert_nechci_kniha.insert` používá nedefinované proměnné (spadne při zavolání); `testing.py` volá neexistující `get_html_osel`; `scripts/.database.py.swo` (vim swap) je commitnutý; `exec.sh` odkazuje na neexistující `web/hello.py`.
-- **Obrázky**: vše se tlačí přes `data:image/jpg;base64` bez ohledu na skutečný formát (PNG/GIF/SVG/WebP); nahrazování přes `str.replace` celého HTML může poškodit obsah; chybějící/nedostupný obrázek = neošetřená výjimka a pád celého scrape běhu.
-- **Deduplikace článků**: detekce „už staženo" stojí jen na URL posledního článku z `select_posledni` (MAX(id_clanky)); když se pořadí na webu změní nebo článek zmizí, vznikají duplicity (UI je jen značkuje `XXXXXXXXXXX`).
-- **Žádný error handling**: jediný špatný XPath, timeout nebo změna struktury webu shodí celý cron běh; žádné retry, žádné logování (jen `print`).
-- **Křehké prostředí**: kód závisí na bězích v `/tmp` (`os.chdir('/tmp')`, `sys.path.insert`), `01_create_environment.sh` má podivný port mapping (`-p 5432:543$CONT_ITER`) a psql příkazy s `"Pa$$w0rd"` ve dvojitých uvozovkách (shell expanduje `$$` na PID — nastavené heslo neodpovídá zamýšlenému).
-- **Flask**: debug mode + bind na 0.0.0.0, `select_clanky()` se volá už při importu modulu, vzor `after_this_request` + `send_file` po redirectu je nespolehlivý pro download.
-- **Nepinované závislosti** v `requirements.txt` (scrapy se instaluje celý kvůli pouhému `Selector`).
+`db/init/` má jen schéma + seed (ne data článků). Plná záloha: `backup/backup.sh`
+(dump do `backup/dumps/`), obnova `backup/restore.sh`.

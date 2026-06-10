@@ -1,12 +1,17 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# Full DB backup (including article data, which db/init does NOT contain) from the
+# dockerised postgres. Output dir configurable via BACKUP_DIR (default ./backup/dumps).
+set -euo pipefail
+cd "$(dirname "$0")/.."
 
-# Set the backup directory
-BACKUP_DIR="/home/smich/Documents/NAS/_10TB/data/_filmy/_ostatni/conversion/regulary/"
+set -a; [ -f .env ] && . ./.env; set +a
+BACKUP_DIR="${BACKUP_DIR:-./backup/dumps}"
+mkdir -p "$BACKUP_DIR"
 
-# Connect to the PostgreSQL database and dump the data to a backup file
-export PGPASSWORD='Pa$$w0rd' 
-pg_dump -U "postgres" -h "localhost" -p "5432" -d conversion -f "$BACKUP_DIR/`date +%Y-%m-%d`.tar" 
+FILE="$BACKUP_DIR/$(date +%Y-%m-%d_%H%M%S).sql"
+# --clean --if-exists so the dump can be restored over an existing DB.
+docker compose exec -T postgres pg_dump --clean --if-exists -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-conversion}" > "$FILE"
+echo "Záloha vytvořena: $FILE"
 
-# Delete backups older than 7 days
-find $BACKUP_DIR -mtime +14 -type f -delete
-
+# Keep ~2 weeks of backups.
+find "$BACKUP_DIR" -name '*.sql' -mtime +14 -type f -delete

@@ -1,6 +1,6 @@
-scrapy
-EbookLib
-requests
-dateparser
-Flask
-psycopg2
+# Python worker dependencies (scraper + EPUB generator). Pinned for reproducible builds.
+scrapy==2.16.0
+EbookLib==0.20
+requests==2.34.2
+dateparser==1.4.0
+psycopg2-binary==2.9.12
