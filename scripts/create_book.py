@@ -44,8 +44,16 @@ class create_book:
         sel = Selector(text=html)
         imgs = sel.css("img::attr(src)").extract()
         for idx, img in enumerate(imgs):
-            base64_img = img.replace("data:image/jpg;base64,", "").encode("ascii")
-            image_bits = base64.decodebytes(base64_img)
+            # Only embed real base64 data URIs (any image type). Plain URLs — e.g.
+            # images whose inlining failed during scraping — are left untouched.
+            if ";base64," not in img:
+                continue
+            base64_part = img.split(";base64,", 1)[1]
+            try:
+                image_bits = base64.decodebytes(base64_part.encode("ascii"))
+            except Exception:
+                # Malformed/truncated base64 must not abort the whole book.
+                continue
             # Zero-padded, chapter+index unique name — no 99-image ceiling (#15).
             soubor = "img_%03d_%03d.jpg" % (self.citac, idx)
             epub_last_image = epub.EpubItem(file_name=soubor, content=image_bits)
