@@ -11,11 +11,12 @@ import type {
 
 const BASE = "/api";
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const res = await fetch(BASE + path, {
-    headers: { "content-type": "application/json" },
-    ...options,
-  });
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  // Only advertise a JSON body when there actually is one — otherwise Fastify
+  // rejects an empty body with "Body cannot be empty" (e.g. POST /scrape).
+  const headers: Record<string, string> = { ...(options.headers as Record<string, string>) };
+  if (options.body) headers["content-type"] = "application/json";
+  const res = await fetch(BASE + path, { ...options, headers });
   if (!res.ok) {
     const body = (await res.json().catch(() => ({}))) as { error?: string };
     throw new Error(body.error ?? res.statusText);

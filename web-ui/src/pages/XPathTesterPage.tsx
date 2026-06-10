@@ -40,8 +40,11 @@ export default function XPathTesterPage() {
 
   const test = useXpathTest();
 
+  // Be forgiving: prepend https:// if the user omitted the scheme.
+  const normalizeUrl = (u: string) => (/^https?:\/\//i.test(u.trim()) ? u.trim() : `https://${u.trim()}`);
+
   const run = () => {
-    const body: Record<string, string> = { url };
+    const body: Record<string, string> = { url: normalizeUrl(url) };
     for (const { key } of XPATH_FIELDS) {
       if (xpaths[key]?.trim()) body[key] = xpaths[key];
     }
