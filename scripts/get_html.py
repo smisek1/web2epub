@@ -46,15 +46,24 @@ def remove_duplicates(values):
 def replace_img_base64(html, site):
     sel = Selector(text=html)
     imgs = sel.css("img::attr(src)").extract()
+    scheme = site[2].split("//", 1)[0]  # e.g. "https:"
+    puresite = scheme + "//" + site[2].split("//", 1)[1].split("/", 1)[0]
     for img in imgs:
-        puresite = (site[2].split("//", 1))[0] + "//" + (site[2].split("//", 1))[1].split("/", 1)[0]
         src = img
-        if src[:4] != "http" and src[:4] != "//me":
-            src = puresite + src
+        if src.startswith("data:"):
+            continue  # already inlined
+        if src.startswith("//"):
+            src = scheme + src  # protocol-relative URL
+        elif not src.startswith("http"):
+            src = puresite + src  # site-relative path
         try:
-            data = requests.get(src, timeout=30).content
-            encoded = str(base64.b64encode(data))[2:-1]
-            html = html.replace(str(img), "data:image/jpg;base64," + encoded)
+            resp = requests.get(src, timeout=30)
+            resp.raise_for_status()
+            mime = resp.headers.get("content-type", "").split(";")[0].strip()
+            if not mime.startswith("image/"):
+                mime = "image/jpeg"
+            encoded = base64.b64encode(resp.content).decode("ascii")
+            html = html.replace(str(img), "data:%s;base64,%s" % (mime, encoded))
         except Exception:
             # A missing/broken image must not kill the whole article.
             log.warning("image download failed, leaving as-is: %s", src)

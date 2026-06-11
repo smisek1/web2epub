@@ -25,7 +25,8 @@ cp .env.example .env          # heslo a porty
 ## Architektura (4 služby na síti `web2epub`)
 
 1. **postgres** — DB `conversion`. Init: `db/init/` (00_role → 01_schema → 02_seed_extra →
-   03_add_datum_importu → 04_add_enabled), ploché ordered SQL pro `docker-entrypoint-initdb.d`.
+   03_add_datum_importu → 04_add_enabled → 05_constraints), ploché ordered SQL pro
+   `docker-entrypoint-initdb.d`.
 2. **python-worker** (`Dockerfile.worker`) — cron 23:00 → `scripts/scrape_cli.py`.
 3. **node-api** (`server/Dockerfile`) — Fastify REST API; image obsahuje i Python runtime,
    protože EPUB a XPath test volá `scripts/*_cli.py` jako subprocess.

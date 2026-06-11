@@ -41,7 +41,10 @@ class insert_clanek(conn_string):
         cursor = self.conn.cursor()
         cursor.execute(
             "INSERT INTO clanky (id_stranka, nadpis, clanek, datum, posledni, uvodni_odstavec, autor) "
-            "VALUES (%s, %s, %s, %s, %s, %s, %s);",
+            "VALUES (%s, %s, %s, %s, %s, %s, %s) "
+            # Dedup safety net: the same URL stored twice for one source is a no-op
+            # (overview pages get reordered; two scrapes may run concurrently).
+            "ON CONFLICT (id_stranka, posledni) DO NOTHING;",
             (str(stranka), nadpis, clanek, datum, posledni, uvodni_odstavec, autor),
         )
         self.conn.commit()

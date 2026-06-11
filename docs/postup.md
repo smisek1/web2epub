@@ -1,4 +1,4 @@
-# Postup přestavby web2epub (stav k 2026-06-10)
+# Postup přestavby web2epub (stav k 2026-06-11)
 
 Shrnutí, co se udělalo a proč — pro navázání v další session.
 
@@ -44,13 +44,36 @@ PostgreSQL → filtrování → tvorba/zahození EPUB knih → přehled knih ke 
   generování. Fix: `__replace_base64_img` vkládá jen skutečné `;base64,` data-URI, ostatní
   přeskočí, dekódování v try/except (`scripts/create_book.py`).
 
+## Zpevnění po review (2026-06-11)
+
+Review plánu + funkční ověření celého stacku (XPath test, EPUB end-to-end). Opraveno:
+
+- **Deduplikace článků**: `db/init/05_constraints.sql` — UNIQUE `(id_stranka, posledni)`
+  na `clanky`, insert scraperu má `ON CONFLICT DO NOTHING` (`scripts/database.py`).
+  Změna pořadí na přehledové stránce ani souběžný scrape už nevytvoří duplicity.
+- **Zámek scrapu**: `POST /api/scrape` při běžícím jobu vrátí jeho id místo spuštění
+  druhého procesu (`server/src/services/scrape.ts`).
+- **Obrázky** (`scripts/get_html.py`): korektní protocol-relative `//…` URL (odstraněn
+  hack `//me`), skip už inlinovaných `data:` URI, MIME z hlavičky Content-Type místo
+  natvrdo `image/jpg`; `create_book.py` odvozuje příponu a `media_type` EPUB itemu
+  z data URI (legacy `image/jpg` → `image/jpeg`).
+- **Koš bez duplicit**: UNIQUE `(id_clanky, id_kniha)` na `kniha_clanek` + `ON CONFLICT
+  DO NOTHING` v trash (`server/src/db/queries/articles.ts`); partial UNIQUE na
+  `kniha.jmeno = 'nechci cist'` (jen jeden koš, běžné knihy se jmenovat stejně smí).
+- `01_create_environment.sh`: čekání přes `sleep 2` místo `docker run busybox`.
+
+Migrace aplikována i na běžící DB přes `psql`. Vše otestováno (dvojitý insert → 1 řádek,
+dvojitý trash → `moved: 0`, druhý koš → chyba, EPUB s PNG má `image/png` v manifestu,
+dva POST /api/scrape → stejný jobId).
+
 ## Aktuální stav prostředí
 
 - Větev **`docs/claude-md`**, commity: `d7a74fa` (přestavba), `664322e` (UI fixy),
-  `c968603` (EPUB fix). **Nepushnuto, žádný PR.**
+  `c968603` (EPUB fix), `f649042` (docs) + necommitnuté opravy z review.
+  **Nepushnuto, žádný PR.**
 - Stack běží (`docker compose ps` = 4 služby). UI http://localhost:8080, API :3000.
-- V DB je ~**90 článků** z testovacího scrapu (osel 50, qubits 20, nature 20), bez duplicit,
-  + 1 kniha (id 95). Lze smazat přes purge, pokud je potřeba čistý start.
+- **DB je prázdná** (volume byl mezi 10. a 11. 6. smazán a znovu inicializován
+  z `db/init/`) — 9 webů ze seedu, enabled = 2,7,8,9,10, žádné články ani knihy.
 
 ## Otevřené body (follow-up)
 

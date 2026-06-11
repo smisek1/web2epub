@@ -96,7 +96,8 @@ export async function removeLinks(id: number): Promise<string | null> {
 export async function trashArticles(ids: number[]) {
   const res = await pool.query(
     `INSERT INTO kniha_clanek (id_clanky, id_kniha)
-     SELECT unnest($1::int[]), (SELECT id_kniha FROM kniha WHERE jmeno = 'nechci cist')`,
+     SELECT unnest($1::int[]), (SELECT id_kniha FROM kniha WHERE jmeno = 'nechci cist')
+     ON CONFLICT (id_clanky, id_kniha) DO NOTHING`,
     [ids],
   );
   return res.rowCount ?? 0;

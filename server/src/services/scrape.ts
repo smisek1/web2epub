@@ -18,6 +18,9 @@ export interface ScrapeJob {
 // In-memory job registry. Fine for a single-instance personal tool.
 const jobs = new Map<string, ScrapeJob>();
 
+// Only one scrape may run at a time; a second request gets the running job back.
+let runningJob: ScrapeJob | null = null;
+
 async function countArticles(): Promise<number> {
   const res = await pool.query<{ c: number }>("SELECT count(*)::int AS c FROM clanky");
   return res.rows[0]?.c ?? 0;
@@ -25,6 +28,8 @@ async function countArticles(): Promise<number> {
 
 // Start a background scrape of all enabled sources; return the job id immediately.
 export async function startScrape(): Promise<ScrapeJob> {
+  if (runningJob && runningJob.status === "running") return runningJob;
+
   const before = await countArticles();
   const job: ScrapeJob = {
     id: randomUUID(),
@@ -33,6 +38,7 @@ export async function startScrape(): Promise<ScrapeJob> {
     articlesBefore: before,
   };
   jobs.set(job.id, job);
+  runningJob = job;
 
   const child = spawn("python3", [scriptPath("scrape_cli.py")], { cwd: config.SCRIPTS_DIR });
   let stderr = "";
@@ -48,11 +54,13 @@ export async function startScrape(): Promise<ScrapeJob> {
       job.status = "failed";
       job.error = stderr.trim().slice(-500);
     }
+    runningJob = null;
   });
   child.on("error", (err) => {
     job.status = "failed";
     job.error = err.message;
     job.finishedAt = new Date().toISOString();
+    runningJob = null;
   });
 
   return job;

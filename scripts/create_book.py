@@ -48,15 +48,22 @@ class create_book:
             # images whose inlining failed during scraping — are left untouched.
             if ";base64," not in img:
                 continue
-            base64_part = img.split(";base64,", 1)[1]
+            header, base64_part = img.split(";base64,", 1)
             try:
                 image_bits = base64.decodebytes(base64_part.encode("ascii"))
             except Exception:
                 # Malformed/truncated base64 must not abort the whole book.
                 continue
+            # Real media type from the data URI (e.g. "data:image/png");
+            # fall back to jpeg for legacy articles with the old fixed prefix.
+            mime = header[5:] if header.startswith("data:image/") else "image/jpeg"
+            if mime == "image/jpg":  # legacy articles used this invalid MIME
+                mime = "image/jpeg"
+            ext = {"image/jpeg": "jpg", "image/png": "png", "image/gif": "gif",
+                   "image/webp": "webp", "image/svg+xml": "svg"}.get(mime, "jpg")
             # Zero-padded, chapter+index unique name — no 99-image ceiling (#15).
-            soubor = "img_%03d_%03d.jpg" % (self.citac, idx)
-            epub_last_image = epub.EpubItem(file_name=soubor, content=image_bits)
+            soubor = "img_%03d_%03d.%s" % (self.citac, idx, ext)
+            epub_last_image = epub.EpubItem(file_name=soubor, content=image_bits, media_type=mime)
             html = html.replace(img, soubor)
             self.book.add_item(epub_last_image)
         return html

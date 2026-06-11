@@ -29,7 +29,7 @@ for _ in $(seq 1 30); do
     break
   fi
   echo -n "."
-  docker run --rm busybox:latest sleep 2 >/dev/null 2>&1
+  sleep 2
 done
 
 echo
