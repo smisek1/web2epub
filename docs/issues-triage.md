@@ -52,19 +52,22 @@ Seznam z issue (2023) pročištěn a zpracován; konfigurace v DB + `db/init/07_
 - 3× jednotlivé články (thequantuminsider 2×, techxplore) — to je use-case #33
 - `nature.com/npjqi/articles` — už dávno v DB (id 10)
 
-## 🛠 Zbývá (1)
+## ✅ #33 — stažení jednotlivé stránky podle URL (`71a8137`)
 
-### #33 — stažení jednotlivé stránky podle URL *(velké, nejdřív návrh)*
-Ad-hoc URL (root.cz, idnes…) → EPUB bez konfigurace webu. Vyžaduje generickou extrakci
-obsahu (readability/trafilatura) místo XPathů. Návrh: `POST /api/articles/from-url` →
-Python CLI s trafilaturou → uložit jako článek speciálního webu „ad-hoc" → existující
-EPUB pipeline. Před implementací odsouhlasit přístup.
+`POST /api/articles/from-url` + pole na stránce Články se dvěma tlačítky:
+**Uložit jako článek** a **Rovnou EPUB** (jednočlánková kniha pojmenovaná podle
+nadpisu). Extrakce generická přes trafilaturu (bez XPathů), článek se ukládá pod
+speciální vypnutý zdroj „ad-hoc" (seed 08), takže knihy/koš/purge fungují beze změny.
+Ověřeno na root.cz. Pozn.: stránky renderované JS (idnes pod paywallem apod.) vrátí
+jen to, co je ve statickém HTML.
 
-### Mimo pořadí: #8 — upload na Dropbox
+## Zbývá rozhodnout
+
+### #8 — upload na Dropbox
 EPUB se streamuje na vyžádání a nikam neukládá. Doporučení: zavřít jako „won't fix".
 
 ## Vedlejší nálezy (mimo issues)
 
-- **quantumtech.blog** (id 8, enabled): URL přehledu `https://quantumtech.blog/blog/`
-  vrací 404 s jakýmkoli UA — web změnil strukturu nebo zanikl. Zvážit vypnutí,
-  nebo najít novou URL přehledu.
+- **quantumtech.blog** (id 8): URL přehledu vrací 404 → web **vypnut** (2026-06-12).
+- Oprava streamování EPUB: jména knih s diakritikou shazovala `Content-Disposition`
+  hlavičku — opraveno v rámci #33 (RFC 5987).
