@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 
 import { listArticles, getArticle, trashArticles, removeLinks } from "../db/queries/articles.js";
+import { runPython, scriptPath } from "../services/python.js";
 
 // "web" may arrive as ?web=2&web=7 or ?web=2,7 — normalise to int[].
 const toIntArray = (v: string | string[] | undefined): number[] | undefined => {
@@ -50,6 +51,18 @@ export async function articleRoutes(app: FastifyInstance) {
     const article = await getArticle(id);
     if (!article) return reply.code(404).send({ error: "article not found" });
     return article;
+  });
+
+  // #33: fetch an arbitrary URL and store it as an 'ad-hoc' article via
+  // generic extraction (trafilatura) — no per-site XPath config needed.
+  app.post("/api/articles/from-url", async (req, reply) => {
+    const { url } = z.object({ url: z.string().url() }).parse(req.body);
+    const { stdout } = await runPython([scriptPath("fetch_url_cli.py"), "--url", url]);
+    const result = JSON.parse(stdout.trim()) as
+      | { id: number; nadpis: string; autor: string; datum: string | null }
+      | { error: string };
+    if ("error" in result) return reply.code(422).send(result);
+    return result;
   });
 
   app.post("/api/articles/trash", async (req) => {

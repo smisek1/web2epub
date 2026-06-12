@@ -13,8 +13,10 @@ import { DataGrid, type GridColDef, type GridRowSelectionModel } from "@mui/x-da
 import { useMemo, useState } from "react";
 
 import ArticleDetailDrawer from "../components/ArticleDetailDrawer";
+import { api } from "../api/client";
 import type { Article, Site } from "../api/types";
 import { useArticles, useCreateBook, useTrash } from "../hooks/useArticles";
+import { useFromUrl } from "../hooks/useFromUrl";
 import { useScrape } from "../hooks/useScrape";
 import { useSites } from "../hooks/useSites";
 
@@ -53,6 +55,19 @@ export default function ArticlesPage() {
   const createBook = useCreateBook();
   const trash = useTrash();
   const scrape = useScrape();
+  const [adhocUrl, setAdhocUrl] = useState("");
+  const fromUrl = useFromUrl();
+  const adhocBusy = fromUrl.save.isPending || fromUrl.saveAsEpub.isPending;
+
+  const saveAdhoc = () =>
+    fromUrl.save.mutate(adhocUrl.trim(), { onSuccess: () => setAdhocUrl("") });
+  const epubAdhoc = () =>
+    fromUrl.saveAsEpub.mutate(adhocUrl.trim(), {
+      onSuccess: ({ book }) => {
+        setAdhocUrl("");
+        window.location.href = api.downloadBookUrl(book.id_kniha);
+      },
+    });
 
   const selectedIds = selection.map(Number);
   const clearSelection = () => setSelection([]);
@@ -178,6 +193,40 @@ export default function ArticlesPage() {
           {scrape.isRunning ? "Stahuji…" : "Stáhni všechny"}
         </Button>
       </Stack>
+
+      <Paper sx={{ p: 2 }}>
+        <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems="center">
+          <TextField
+            label="Stáhnout článek z URL (bez konfigurace webu)"
+            size="small"
+            sx={{ flex: 1 }}
+            value={adhocUrl}
+            onChange={(e) => setAdhocUrl(e.target.value)}
+            placeholder="https://www.root.cz/clanky/…"
+          />
+          <Button variant="outlined" disabled={!adhocUrl.trim() || adhocBusy} onClick={saveAdhoc}>
+            {fromUrl.save.isPending ? "Stahuji…" : "Uložit jako článek"}
+          </Button>
+          <Button variant="contained" disabled={!adhocUrl.trim() || adhocBusy} onClick={epubAdhoc}>
+            {fromUrl.saveAsEpub.isPending ? "Stahuji…" : "Rovnou EPUB"}
+          </Button>
+        </Stack>
+        {fromUrl.save.isSuccess && (
+          <Alert severity="success" sx={{ mt: 1 }} onClose={() => fromUrl.save.reset()}>
+            Uloženo: {fromUrl.save.data.nadpis}
+          </Alert>
+        )}
+        {fromUrl.save.isError && (
+          <Alert severity="error" sx={{ mt: 1 }} onClose={() => fromUrl.save.reset()}>
+            {(fromUrl.save.error as Error).message}
+          </Alert>
+        )}
+        {fromUrl.saveAsEpub.isError && (
+          <Alert severity="error" sx={{ mt: 1 }} onClose={() => fromUrl.saveAsEpub.reset()}>
+            {(fromUrl.saveAsEpub.error as Error).message}
+          </Alert>
+        )}
+      </Paper>
 
       {scrape.job?.status === "done" && (
         <Alert severity="success">Staženo nových článků: {scrape.job.articlesAdded}</Alert>

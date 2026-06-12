@@ -23,8 +23,12 @@ export async function bookExists(id: number): Promise<boolean> {
 }
 
 // Create a book from selected article ids, in one transaction.
-// Book name: YYYY-MM-DD_<distinct source names, '.'→'_'> (same format as before).
-export async function createBook(ids: number[]): Promise<{ id_kniha: number; jmeno: string }> {
+// Default name: YYYY-MM-DD_<distinct source names, '.'→'_'>; a caller-supplied
+// name wins (single-article EPUB from an ad-hoc URL is named by its title, #33).
+export async function createBook(
+  ids: number[],
+  jmenoOverride?: string,
+): Promise<{ id_kniha: number; jmeno: string }> {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
@@ -37,8 +41,8 @@ export async function createBook(ids: number[]): Promise<{ id_kniha: number; jme
        WHERE c.id_clanky = ANY($1::int[])`,
       [ids],
     );
-    const jmeno = nameRes.rows[0]?.jmeno;
-    if (!jmeno) {
+    const jmeno = jmenoOverride ?? nameRes.rows[0]?.jmeno;
+    if (!nameRes.rows[0]?.jmeno) {
       throw new Error("no matching articles for given ids");
     }
 

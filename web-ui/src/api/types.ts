@@ -84,6 +84,14 @@ export interface XpathTestResult {
   errors: Record<string, string>;
 }
 
+// Result of POST /api/articles/from-url (#33).
+export interface FromUrlResult {
+  id: number;
+  nadpis: string;
+  autor: string;
+  datum: string | null;
+}
+
 export interface ScrapeJob {
   id: string;
   status: "running" | "done" | "failed";

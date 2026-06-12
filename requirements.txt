@@ -4,3 +4,5 @@ EbookLib==0.20
 requests==2.34.2
 dateparser==1.4.0
 psycopg2-binary==2.9.12
+trafilatura==2.1.0
+lxml_html_clean==0.4.5  # justext (trafilatura dep) needs it with current lxml

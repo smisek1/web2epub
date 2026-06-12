@@ -87,6 +87,31 @@ class select_posledni(conn_string):
         return "nic" if output is None else output[0]
 
 
+class select_stranka_id(conn_string):
+    """id_stranka for a source name (fetch_url_cli looks up the 'ad-hoc' source)."""
+
+    def __init__(self, jmeno):
+        super().__init__()
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT id_stranka FROM stranka WHERE jmeno = %s;", (jmeno,))
+        row = cursor.fetchone()
+        self.id = row[0] if row else None
+
+
+class select_clanek_id(conn_string):
+    """id of the article with the given source + URL (the dedup key)."""
+
+    def __init__(self, id_stranka, posledni):
+        super().__init__()
+        cursor = self.conn.cursor()
+        cursor.execute(
+            "SELECT id_clanky FROM clanky WHERE id_stranka = %s AND posledni = %s;",
+            (id_stranka, posledni),
+        )
+        row = cursor.fetchone()
+        self.id = row[0] if row else None
+
+
 # *********************************************************
 # EPUB queries (used by epub_cli.py / create_book.py)
 # *********************************************************

@@ -3,6 +3,7 @@ import type {
   ArticleFilters,
   ArticlesResponse,
   Book,
+  FromUrlResult,
   ScrapeJob,
   Site,
   SiteInput,
@@ -44,10 +45,15 @@ export const api = {
   listArticles: (f: ArticleFilters) =>
     request<ArticlesResponse>(`/articles?${articlesQuery(f)}`),
   getArticle: (id: number) => request<ArticleDetail>(`/articles/${id}`),
-  createBook: (ids: number[]) =>
+  createBook: (ids: number[], jmeno?: string) =>
     request<{ id_kniha: number; jmeno: string }>(`/books`, {
       method: "POST",
-      body: JSON.stringify({ ids }),
+      body: JSON.stringify(jmeno ? { ids, jmeno } : { ids }),
+    }),
+  fromUrl: (url: string) =>
+    request<FromUrlResult>(`/articles/from-url`, {
+      method: "POST",
+      body: JSON.stringify({ url }),
     }),
   trash: (ids: number[]) =>
     request<{ moved: number }>(`/articles/trash`, {
