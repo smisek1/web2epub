@@ -2,6 +2,7 @@
 article links via XPath, and stores new articles (images inlined as base64)."""
 import base64
 import logging
+import re
 
 import requests
 from scrapy.selector import Selector
@@ -45,6 +46,9 @@ def remove_duplicates(values):
 
 
 def replace_img_base64(html, site):
+    # Drop srcset/sizes: the src URL repeats inside srcset, so the plain
+    # string replace below would duplicate the base64 payload (#18).
+    html = re.sub(r'\s(?:srcset|sizes)="[^"]*"', "", html)
     sel = Selector(text=html)
     imgs = sel.css("img::attr(src)").extract()
     scheme = site[2].split("//", 1)[0]  # e.g. "https:"
@@ -58,13 +62,20 @@ def replace_img_base64(html, site):
         elif not src.startswith("http"):
             src = puresite + src  # site-relative path
         try:
-            resp = requests.get(src, timeout=30)
+            resp = requests.get(src, headers={"user-agent": USER_AGENT}, timeout=30)
             resp.raise_for_status()
             mime = resp.headers.get("content-type", "").split(";")[0].strip()
             if not mime.startswith("image/"):
                 mime = "image/jpeg"
             encoded = base64.b64encode(resp.content).decode("ascii")
-            html = html.replace(str(img), "data:%s;base64,%s" % (mime, encoded))
+            data_uri = "data:%s;base64,%s" % (mime, encoded)
+            # Replace only src attributes — the same URL may also appear in
+            # an <a href> (WordPress links thumbnails to full-size images).
+            anchored = 'src="%s"' % img
+            if anchored in html:
+                html = html.replace(anchored, 'src="%s"' % data_uri)
+            else:
+                html = html.replace(str(img), data_uri)
         except Exception:
             # A missing/broken image must not kill the whole article.
             log.warning("image download failed, leaving as-is: %s", src)
