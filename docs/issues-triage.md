@@ -61,10 +61,12 @@ speciální vypnutý zdroj „ad-hoc" (seed 08), takže knihy/koš/purge funguj�
 Ověřeno na root.cz. Pozn.: stránky renderované JS (idnes pod paywallem apod.) vrátí
 jen to, co je ve statickém HTML.
 
-## Zbývá rozhodnout
+## Zbývá implementovat
 
-### #8 — upload na Dropbox
-EPUB se streamuje na vyžádání a nikam neukládá. Doporučení: zavřít jako „won't fix".
+### #8 — sync knih do PocketBooku
+Původní „Dropbox uploading" nahrazen odsouhlaseným návrhem: auto-export EPUB do
+`/export` + rclone sidecar → Dropbox → nativní PocketBook Sync.
+**Detailní plán: [pocketbook-sync.md](pocketbook-sync.md).**
 
 ## Vedlejší nálezy (mimo issues)
 
