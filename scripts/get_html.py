@@ -10,7 +10,8 @@ import database
 
 log = logging.getLogger(__name__)
 
-USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:65.0) Gecko/20100101 Firefox/65.0"
+# Descriptive bot UA: phys.org (and others) return 403 unless the bot identifies itself (#28).
+USER_AGENT = "Mozilla/5.0 (compatible; web2epub/1.0; +https://github.com/smisek1/web2epub)"
 
 
 class main_throuhgh_sites:
