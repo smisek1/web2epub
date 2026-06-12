@@ -43,6 +43,9 @@ Při prvním startu se DB inicializuje ze souborů v `db/init/` (schéma, seed w
 3. **Weby** — CRUD konfigurace webů včetně XPath polí a zapnutí/vypnutí.
 4. **XPath tester** — vyzkoušej XPathy na URL bez zápisu do DB.
 
+Návod na přidání nového webu (hledání XPathů, testování, stránkování):
+**[docs/novy-web.md](docs/novy-web.md)**.
+
 ## Struktura
 
 ```
