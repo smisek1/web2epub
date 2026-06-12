@@ -55,7 +55,13 @@ export async function articleRoutes(app: FastifyInstance) {
   });
 
   // Distinct authors for the filter dropdown (static route wins over /:id).
-  app.get("/api/articles/authors", async () => listAuthors());
+  // Optional ?web=… scopes authors to the selected sites so the two filters chain.
+  app.get("/api/articles/authors", async (req) => {
+    const { web } = z
+      .object({ web: z.union([z.string(), z.array(z.string())]).optional().transform(toIntArray) })
+      .parse(req.query);
+    return listAuthors(web ?? null);
+  });
 
   app.get("/api/articles/:id", async (req, reply) => {
     const { id } = idParamSchema.parse(req.params);

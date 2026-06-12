@@ -13,7 +13,7 @@ import {
   TextField,
 } from "@mui/material";
 import { DataGrid, type GridColDef, type GridRowSelectionModel } from "@mui/x-data-grid";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import ArticleDetailDrawer from "../components/ArticleDetailDrawer";
 import { api } from "../api/client";
@@ -31,9 +31,20 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 export default function ArticlesPage() {
   const { data: sites } = useSites();
-  const { data: authors } = useAuthors();
   const [selectedSites, setSelectedSites] = useState<Site[]>([]);
   const [selectedAuthors, setSelectedAuthors] = useState<string[]>([]);
+  // Authors are scoped to the selected sites so the two filters chain together.
+  const selectedSiteIds = useMemo(() => selectedSites.map((s) => s.idStranka), [selectedSites]);
+  const { data: authors } = useAuthors(selectedSiteIds);
+
+  // When narrowing the sites drops some authors, clear any now-invalid selection.
+  useEffect(() => {
+    if (!authors) return;
+    setSelectedAuthors((prev) => {
+      const next = prev.filter((a) => authors.includes(a));
+      return next.length === prev.length ? prev : next;
+    });
+  }, [authors]);
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");

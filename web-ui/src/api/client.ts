@@ -45,7 +45,12 @@ export const api = {
   listArticles: (f: ArticleFilters) =>
     request<ArticlesResponse>(`/articles?${articlesQuery(f)}`),
   getArticle: (id: number) => request<ArticleDetail>(`/articles/${id}`),
-  listAuthors: () => request<string[]>(`/articles/authors`),
+  listAuthors: (web?: number[]) => {
+    const p = new URLSearchParams();
+    web?.forEach((w) => p.append("web", String(w)));
+    const qs = p.toString();
+    return request<string[]>(`/articles/authors${qs ? `?${qs}` : ""}`);
+  },
   createBook: (ids: number[], jmeno?: string) =>
     request<{ id_kniha: number; jmeno: string }>(`/books`, {
       method: "POST",

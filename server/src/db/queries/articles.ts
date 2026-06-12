@@ -65,12 +65,16 @@ export async function listArticles(f: ArticleFilters) {
 }
 
 // Distinct authors of unhandled articles — feeds the author filter dropdown.
-export async function listAuthors(): Promise<string[]> {
+// When `web` is set, only authors that appear in those sites' articles are
+// returned, so the author filter stays in sync with the selected sites.
+export async function listAuthors(web: number[] | null = null): Promise<string[]> {
   const res = await pool.query<{ autor: string }>(
     `SELECT DISTINCT c.autor
      ${FROM}
      WHERE kc.id_clanky IS NULL AND c.autor IS NOT NULL AND c.autor <> ''
+       AND ($1::int[] IS NULL OR s.id_stranka = ANY($1))
      ORDER BY c.autor`,
+    [web],
   );
   return res.rows.map((r) => r.autor);
 }

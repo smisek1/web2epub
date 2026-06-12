@@ -10,10 +10,10 @@ export function useArticles(filters: ArticleFilters) {
   });
 }
 
-export function useAuthors() {
+export function useAuthors(web?: number[]) {
   return useQuery({
-    queryKey: ["authors"],
-    queryFn: () => api.listAuthors(),
+    queryKey: ["authors", web ?? []],
+    queryFn: () => api.listAuthors(web),
   });
 }
 
