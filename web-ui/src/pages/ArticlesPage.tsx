@@ -15,7 +15,7 @@ import { useMemo, useState } from "react";
 import ArticleDetailDrawer from "../components/ArticleDetailDrawer";
 import { api } from "../api/client";
 import type { Article, Site } from "../api/types";
-import { useArticles, useCreateBook, useTrash } from "../hooks/useArticles";
+import { useArticles, useAuthors, useCreateBook, useTrash } from "../hooks/useArticles";
 import { useFromUrl } from "../hooks/useFromUrl";
 import { useScrape } from "../hooks/useScrape";
 import { useSites } from "../hooks/useSites";
@@ -24,8 +24,9 @@ const fmtDate = (v: string | null) => (v ? v.slice(0, 10) : "");
 
 export default function ArticlesPage() {
   const { data: sites } = useSites();
+  const { data: authors } = useAuthors();
   const [selectedSites, setSelectedSites] = useState<Site[]>([]);
-  const [autor, setAutor] = useState("");
+  const [selectedAuthors, setSelectedAuthors] = useState<string[]>([]);
   const [q, setQ] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
@@ -39,7 +40,7 @@ export default function ArticlesPage() {
   const filters = useMemo(
     () => ({
       web: selectedSites.length ? selectedSites.map((s) => s.idStranka) : undefined,
-      autor: autor || undefined,
+      autor: selectedAuthors.length ? selectedAuthors : undefined,
       q: q || undefined,
       dateFrom: dateFrom || undefined,
       dateTo: dateTo || undefined,
@@ -48,7 +49,7 @@ export default function ArticlesPage() {
       sortBy: "datum" as const,
       sortDir: "desc" as const,
     }),
-    [selectedSites, autor, q, dateFrom, dateTo, paginationModel],
+    [selectedSites, selectedAuthors, q, dateFrom, dateTo, paginationModel],
   );
 
   const { data, isLoading, error } = useArticles(filters);
@@ -133,14 +134,16 @@ export default function ArticlesPage() {
               resetPage();
             }}
           />
-          <TextField
-            label="Autor"
-            size="small"
-            value={autor}
-            onChange={(e) => {
-              setAutor(e.target.value);
+          <Autocomplete
+            multiple
+            sx={{ minWidth: 240, flex: 1 }}
+            options={authors ?? []}
+            value={selectedAuthors}
+            onChange={(_e, v) => {
+              setSelectedAuthors(v);
               resetPage();
             }}
+            renderInput={(params) => <TextField {...params} label="Autoři" size="small" />}
           />
           <TextField
             label="Od"

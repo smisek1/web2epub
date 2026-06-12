@@ -32,7 +32,7 @@ function articlesQuery(f: ArticleFilters): string {
   f.web?.forEach((w) => p.append("web", String(w)));
   if (f.dateFrom) p.set("dateFrom", f.dateFrom);
   if (f.dateTo) p.set("dateTo", f.dateTo);
-  if (f.autor) p.set("autor", f.autor);
+  f.autor?.forEach((a) => p.append("autor", a));
   if (f.q) p.set("q", f.q);
   p.set("page", String(f.page));
   p.set("pageSize", String(f.pageSize));
@@ -45,6 +45,7 @@ export const api = {
   listArticles: (f: ArticleFilters) =>
     request<ArticlesResponse>(`/articles?${articlesQuery(f)}`),
   getArticle: (id: number) => request<ArticleDetail>(`/articles/${id}`),
+  listAuthors: () => request<string[]>(`/articles/authors`),
   createBook: (ids: number[], jmeno?: string) =>
     request<{ id_kniha: number; jmeno: string }>(`/books`, {
       method: "POST",

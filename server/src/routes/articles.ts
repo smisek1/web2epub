@@ -1,7 +1,7 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 
-import { listArticles, getArticle, trashArticles, removeLinks } from "../db/queries/articles.js";
+import { listArticles, listAuthors, getArticle, trashArticles, removeLinks } from "../db/queries/articles.js";
 import { runPython, scriptPath } from "../services/python.js";
 
 // "web" may arrive as ?web=2&web=7 or ?web=2,7 — normalise to int[].
@@ -15,11 +15,19 @@ const toIntArray = (v: string | string[] | undefined): number[] | undefined => {
   return nums.length ? nums : undefined;
 };
 
+// "autor" may arrive as ?autor=A&autor=B — normalise to string[] (no comma
+// splitting: author names may legitimately contain commas).
+const toStrArray = (v: string | string[] | undefined): string[] | undefined => {
+  if (v === undefined) return undefined;
+  const arr = (Array.isArray(v) ? v : [v]).filter((s) => s.length > 0);
+  return arr.length ? arr : undefined;
+};
+
 const listQuerySchema = z.object({
   web: z.union([z.string(), z.array(z.string())]).optional().transform(toIntArray),
   dateFrom: z.string().optional(),
   dateTo: z.string().optional(),
-  autor: z.string().optional(),
+  autor: z.union([z.string(), z.array(z.string())]).optional().transform(toStrArray),
   q: z.string().optional(),
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(200).default(50),
@@ -45,6 +53,9 @@ export async function articleRoutes(app: FastifyInstance) {
       sortDir: q.sortDir,
     });
   });
+
+  // Distinct authors for the filter dropdown (static route wins over /:id).
+  app.get("/api/articles/authors", async () => listAuthors());
 
   app.get("/api/articles/:id", async (req, reply) => {
     const { id } = idParamSchema.parse(req.params);

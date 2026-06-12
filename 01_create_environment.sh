@@ -12,6 +12,11 @@ if [ ! -f .env ]; then
   echo "Vytvořen .env z .env.example — uprav heslo v .env."
 fi
 
+# Fresh start: remove previous containers (and the network) first. The DB
+# volume is intentionally kept — articles survive; full wipe = `docker compose down -v`.
+echo "Odstraňuji předešlé kontejnery…"
+docker compose down --remove-orphans
+
 # Only start services that are buildable right now.
 services="postgres python-worker"
 [ -f server/Dockerfile ] && services="$services node-api"

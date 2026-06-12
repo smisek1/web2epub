@@ -25,7 +25,7 @@ export interface ArticleFilters {
   web?: number[];
   dateFrom?: string;
   dateTo?: string;
-  autor?: string;
+  autor?: string[];
   q?: string;
   page: number;
   pageSize: number;

@@ -4,7 +4,7 @@ export interface ArticleFilters {
   web: number[] | null;
   dateFrom: string | null;
   dateTo: string | null;
-  autor: string | null;
+  autor: string[] | null;
   q: string | null;
   page: number;
   pageSize: number;
@@ -24,7 +24,7 @@ const WHERE = `
     AND ($1::int[] IS NULL OR s.id_stranka = ANY($1))           -- web
     AND ($2::date  IS NULL OR c.datum >= $2)                    -- dateFrom
     AND ($3::date  IS NULL OR c.datum <= $3)                    -- dateTo
-    AND ($4::text  IS NULL OR c.autor ILIKE '%'||$4||'%')       -- autor
+    AND ($4::text[] IS NULL OR c.autor = ANY($4))               -- autor
     AND ($5::text  IS NULL OR c.nadpis ILIKE '%'||$5||'%' OR c.clanek ILIKE '%'||$5||'%')`;
 
 const FROM = `
@@ -62,6 +62,17 @@ export async function listArticles(f: ArticleFilters) {
   );
 
   return { items: itemsRes.rows, total, page: f.page, pageSize: f.pageSize };
+}
+
+// Distinct authors of unhandled articles — feeds the author filter dropdown.
+export async function listAuthors(): Promise<string[]> {
+  const res = await pool.query<{ autor: string }>(
+    `SELECT DISTINCT c.autor
+     ${FROM}
+     WHERE kc.id_clanky IS NULL AND c.autor IS NOT NULL AND c.autor <> ''
+     ORDER BY c.autor`,
+  );
+  return res.rows.map((r) => r.autor);
 }
 
 export async function getArticle(id: number) {
