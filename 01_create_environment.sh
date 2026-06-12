@@ -12,10 +12,14 @@ if [ ! -f .env ]; then
   echo "Vytvořen .env z .env.example — uprav heslo v .env."
 fi
 
-# Fresh start: remove previous containers (and the network) first. The DB
-# volume is intentionally kept — articles survive; full wipe = `docker compose down -v`.
-echo "Odstraňuji předešlé kontejnery…"
-docker compose down --remove-orphans
+# Fresh start: remove previous containers, network AND the DB volume (-v).
+# This guarantees an identical setup on any machine — the DB is always
+# re-initialised from db/init/ (schema + seed + constraints), so a stale
+# volume can never miss a later migration (e.g. 05_constraints.sql, whose
+# missing unique index silently broke article inserts). Trade-off: scraped
+# articles are wiped on every run; back them up first with backup/backup.sh.
+echo "Odstraňuji předešlé kontejnery a DB volume…"
+docker compose down -v --remove-orphans
 
 # Only start services that are buildable right now.
 services="postgres python-worker"
