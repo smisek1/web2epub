@@ -22,6 +22,8 @@ const XPATH_FIELDS: { key: string; label: string }[] = [
   { key: "xpath_datum", label: "XPath datum" },
   { key: "xpath_uvodni_odstavec", label: "XPath úvodní odstavec" },
   { key: "xpath_autor", label: "XPath autor" },
+  { key: "xpath_next_prehled", label: "XPath další stránka přehledu" },
+  { key: "xpath_next_clanek", label: "XPath další stránka článku" },
 ];
 
 export default function XPathTesterPage() {
@@ -36,6 +38,8 @@ export default function XPathTesterPage() {
     xpath_datum: prefill?.xpath_datum ?? "",
     xpath_uvodni_odstavec: prefill?.xpath_uvodni_odstavec ?? "",
     xpath_autor: prefill?.xpath_autor ?? "",
+    xpath_next_prehled: prefill?.xpath_next_prehled ?? "",
+    xpath_next_clanek: prefill?.xpath_next_clanek ?? "",
   });
 
   const test = useXpathTest();
@@ -95,6 +99,8 @@ export default function XPathTesterPage() {
           <Field label="Datum" value={result.datum} />
           <Field label="Autor" value={result.autor} />
           <Field label="Úvodní odstavec" value={result.uvodni_odstavec} />
+          <Field label="Další stránka přehledu" value={result.next_prehled} />
+          <Field label="Další stránka článku" value={result.next_clanek} />
           {result.clanek !== undefined && (
             <Box sx={{ mt: 1 }}>
               <Typography variant="subtitle2">Článek (náhled)</Typography>

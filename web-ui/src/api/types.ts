@@ -51,6 +51,9 @@ export interface Site {
   xpath_datum: string | null;
   xpath_uvodni_odstavec: string | null;
   xpath_autor: string | null;
+  xpath_next_prehled: string | null;
+  xpath_next_clanek: string | null;
+  max_stranek: number;
 }
 
 // Site payload for create/update (no id).
@@ -63,6 +66,9 @@ export interface SiteInput {
   xpath_datum: string | null;
   xpath_uvodni_odstavec: string | null;
   xpath_autor: string | null;
+  xpath_next_prehled: string | null;
+  xpath_next_clanek: string | null;
+  max_stranek: number;
   enabled: boolean;
 }
 
@@ -73,6 +79,8 @@ export interface XpathTestResult {
   datum?: string;
   uvodni_odstavec?: string;
   autor?: string;
+  next_prehled?: string;
+  next_clanek?: string;
   errors: Record<string, string>;
 }
 

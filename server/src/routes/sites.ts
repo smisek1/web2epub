@@ -23,6 +23,9 @@ const siteBodySchema = z.object({
   xpath_datum: nullableXpath,
   xpath_uvodni_odstavec: nullableXpath,
   xpath_autor: nullableXpath,
+  xpath_next_prehled: nullableXpath,
+  xpath_next_clanek: nullableXpath,
+  max_stranek: z.coerce.number().int().min(0).default(0),
   enabled: z.boolean().default(true),
 });
 

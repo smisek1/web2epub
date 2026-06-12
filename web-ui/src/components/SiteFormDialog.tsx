@@ -22,6 +22,9 @@ const EMPTY: SiteInput = {
   xpath_datum: "",
   xpath_uvodni_odstavec: "",
   xpath_autor: "",
+  xpath_next_prehled: "",
+  xpath_next_clanek: "",
+  max_stranek: 0,
   enabled: true,
 };
 
@@ -32,6 +35,8 @@ const XPATH_FIELDS: { key: keyof SiteInput; label: string }[] = [
   { key: "xpath_datum", label: "XPath datum" },
   { key: "xpath_uvodni_odstavec", label: "XPath úvodní odstavec" },
   { key: "xpath_autor", label: "XPath autor" },
+  { key: "xpath_next_prehled", label: "XPath další stránka přehledu" },
+  { key: "xpath_next_clanek", label: "XPath další stránka článku" },
 ];
 
 function fromSite(site: Site): SiteInput {
@@ -44,6 +49,9 @@ function fromSite(site: Site): SiteInput {
     xpath_datum: site.xpath_datum ?? "",
     xpath_uvodni_odstavec: site.xpath_uvodni_odstavec ?? "",
     xpath_autor: site.xpath_autor ?? "",
+    xpath_next_prehled: site.xpath_next_prehled ?? "",
+    xpath_next_clanek: site.xpath_next_clanek ?? "",
+    max_stranek: site.max_stranek ?? 0,
     enabled: site.enabled,
   };
 }
@@ -94,6 +102,15 @@ export default function SiteFormDialog({
               size="small"
             />
           ))}
+          <TextField
+            label="Max stránek přehledu (0 = bez limitu)"
+            type="number"
+            inputProps={{ min: 0 }}
+            value={form.max_stranek}
+            onChange={(e) => setForm((f) => ({ ...f, max_stranek: Math.max(0, Number(e.target.value) || 0) }))}
+            size="small"
+            helperText="Kolik stránek přehledu scraper celkem projde, než se zastaví; vždy končí u prvního už staženého článku."
+          />
           <FormControlLabel
             control={<Switch checked={form.enabled} onChange={(e) => set("enabled", e.target.checked)} />}
             label="Aktivní (zahrnout do scrapování)"

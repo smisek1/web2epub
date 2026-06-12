@@ -3,6 +3,7 @@ article links via XPath, and stores new articles (images inlined as base64)."""
 import base64
 import logging
 import re
+from urllib.parse import urljoin
 
 import requests
 from scrapy.selector import Selector
@@ -13,6 +14,23 @@ log = logging.getLogger(__name__)
 
 # Descriptive bot UA: phys.org (and others) return 403 unless the bot identifies itself (#28).
 USER_AGENT = "Mozilla/5.0 (compatible; web2epub/1.0; +https://github.com/smisek1/web2epub)"
+
+# Safety caps for pagination (#31) — a broken next-page XPath or a circular
+# link must never keep the scraper running forever.
+HARD_MAX_LIST_PAGES = 200
+MAX_ARTICLE_PAGES = 30
+
+
+def fetch_selector(link):
+    """Fetch a URL and wrap it in a Selector (same fetch as get_soup)."""
+    result = requests.get(link, headers={"user-agent": USER_AGENT}, timeout=30)
+    return Selector(text=result.content)
+
+
+def absolute_url(url, base):
+    """Resolve any relative URL (absolute, root- or dir-relative, scheme-
+    relative) against the page it was found on."""
+    return urljoin(base, url)
 
 
 class main_throuhgh_sites:
@@ -91,6 +109,7 @@ class get_html(get_soup):
     def __init__(self, link, site):
         super().__init__(link)
         log.info("article: %s", link)
+        self.link = link
         self.nadpis = self.__get_nadpis(self.soup, site)
         self.clanek = self.__get_clanek(self.soup, site)
         self.datum = self.__get_datum(self.soup, site)
@@ -102,8 +121,27 @@ class get_html(get_soup):
         return "".join(clanky.extract())
 
     def __get_clanek(self, soup, site):
-        clanky = soup.xpath(site[5])
-        return replace_img_base64("".join(clanky.extract()), site)
+        parts = ["".join(soup.xpath(site[5]).extract())]
+        # Multi-page article (#31): follow xpath_next_clanek and concatenate
+        # the body of every page.
+        xpath_next = site[10]
+        if xpath_next:
+            aktualni = self.link  # URL of the article page being processed
+            visited = {aktualni}
+            cur = soup
+            while len(parts) < MAX_ARTICLE_PAGES:
+                dalsi = cur.xpath(xpath_next).extract_first()
+                if not dalsi:
+                    break  # last page of the article
+                dalsi = absolute_url(dalsi, aktualni)
+                if dalsi in visited:
+                    break  # cycle protection
+                visited.add(dalsi)
+                log.info("article page %d: %s", len(parts) + 1, dalsi)
+                cur = fetch_selector(dalsi)
+                aktualni = dalsi
+                parts.append("".join(cur.xpath(site[5]).extract()))
+        return replace_img_base64("".join(parts), site)
 
     def __get_datum(self, soup, site):
         import dateparser
@@ -126,7 +164,10 @@ class get_html(get_soup):
 
 
 class get_links(get_soup):
-    """Extract article links from a source's overview page and store new ones."""
+    """Extract article links from a source's overview page(s) and store new
+    ones. With xpath_next_prehled set, the scraper keeps turning overview
+    pages until it reaches the newest stored article, the end of the listing,
+    or max_stranek pages (0 = no limit) (#31)."""
 
     def __init__(self, site):
         super().__init__(site[2])
@@ -136,17 +177,36 @@ class get_links(get_soup):
     def __get_linky(self, soup, site):
         odkaz = []
         self.posledni = database.select_posledni(site[0])
-        samples = soup.xpath(site[3])
-        for a in samples:
-            puresite = (site[2].split("//", 1))[0] + "//" + (site[2].split("//", 1))[1].split("/", 1)[0]
-            if puresite not in a.extract():
-                onesite = puresite + a.extract()
-            else:
-                onesite = a.extract()
-            # Stop once we reach the last already-stored article.
-            if self.posledni.sites == onesite:
-                return remove_duplicates(odkaz)
-            odkaz.append(onesite)
+        xpath_next = site[9]
+        max_stranek = site[11] or 0  # total overview pages, 0 = unlimited
+        aktualni = site[2]  # URL of the overview page being processed
+        visited = {aktualni}
+        stranka = 1
+        while True:
+            for a in soup.xpath(site[3]):
+                onesite = absolute_url(a.extract(), aktualni)
+                # Stop once we reach the last already-stored article.
+                if self.posledni.sites == onesite:
+                    return remove_duplicates(odkaz)
+                odkaz.append(onesite)
+            if not xpath_next:
+                break
+            if max_stranek and stranka >= max_stranek:
+                break
+            if stranka >= HARD_MAX_LIST_PAGES:
+                log.warning("pagination hit the hard cap (%d pages): %s", stranka, site[2])
+                break
+            dalsi = soup.xpath(xpath_next).extract_first()
+            if not dalsi:
+                break  # no next link — end of the listing
+            dalsi = absolute_url(dalsi, aktualni)
+            if dalsi in visited:
+                break  # cycle protection
+            visited.add(dalsi)
+            log.info("overview page %d: %s", stranka + 1, dalsi)
+            soup = fetch_selector(dalsi)
+            aktualni = dalsi
+            stranka += 1
         return remove_duplicates(odkaz)
 
     def __get_vse(self, linky, site):

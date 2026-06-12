@@ -26,6 +26,8 @@ def main():
     parser.add_argument("--xpath-datum", default=None)
     parser.add_argument("--xpath-uvodni-odstavec", default=None)
     parser.add_argument("--xpath-autor", default=None)
+    parser.add_argument("--xpath-next-prehled", default=None)
+    parser.add_argument("--xpath-next-clanek", default=None)
     args = parser.parse_args()
 
     try:
@@ -43,6 +45,8 @@ def main():
         "datum": args.xpath_datum,
         "uvodni_odstavec": args.xpath_uvodni_odstavec,
         "autor": args.xpath_autor,
+        "next_prehled": args.xpath_next_prehled,
+        "next_clanek": args.xpath_next_clanek,
     }
     for name, xpath in fields.items():
         if not xpath:

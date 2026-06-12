@@ -11,6 +11,8 @@ const bodySchema = z.object({
   xpath_datum: z.string().optional(),
   xpath_uvodni_odstavec: z.string().optional(),
   xpath_autor: z.string().optional(),
+  xpath_next_prehled: z.string().optional(),
+  xpath_next_clanek: z.string().optional(),
 });
 
 // Map body keys to the CLI's --xpath-* flags.
@@ -21,6 +23,8 @@ const FLAGS: Record<string, string> = {
   xpath_datum: "--xpath-datum",
   xpath_uvodni_odstavec: "--xpath-uvodni-odstavec",
   xpath_autor: "--xpath-autor",
+  xpath_next_prehled: "--xpath-next-prehled",
+  xpath_next_clanek: "--xpath-next-clanek",
 };
 
 export async function xpathRoutes(app: FastifyInstance) {

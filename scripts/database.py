@@ -61,7 +61,8 @@ class select_sites(conn_string):
         cursor = self.conn.cursor()
         cursor.execute(
             "SELECT id_stranka, jmeno, link, xpath_links, xpath_nadpis, xpath_clanek, "
-            "xpath_datum, xpath_uvodni_odstavec, xpath_autor "
+            "xpath_datum, xpath_uvodni_odstavec, xpath_autor, "
+            "xpath_next_prehled, xpath_next_clanek, max_stranek "
             "FROM stranka WHERE enabled = true ORDER BY id_stranka;"
         )
         return list(cursor.fetchall())
