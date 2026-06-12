@@ -1,9 +1,12 @@
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import DownloadIcon from "@mui/icons-material/CloudDownload";
 import {
   Alert,
   Autocomplete,
   Box,
   Button,
+  Checkbox,
   Link,
   Paper,
   Stack,
@@ -21,6 +24,10 @@ import { useScrape } from "../hooks/useScrape";
 import { useSites } from "../hooks/useSites";
 
 const fmtDate = (v: string | null) => (v ? v.slice(0, 10) : "");
+
+// Shared checkbox icons for the multi-select filter dropdowns.
+const checkIcon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 export default function ArticlesPage() {
   const { data: sites } = useSites();
@@ -114,6 +121,7 @@ export default function ArticlesPage() {
         <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems="center" flexWrap="wrap">
           <Autocomplete
             multiple
+            disableCloseOnSelect
             sx={{ minWidth: 240, flex: 1 }}
             options={sites ?? []}
             getOptionLabel={(s) => s.jmeno}
@@ -122,6 +130,15 @@ export default function ArticlesPage() {
             onChange={(_e, v) => {
               setSelectedSites(v);
               resetPage();
+            }}
+            renderOption={(props, option, { selected }) => {
+              const { key, ...rest } = props;
+              return (
+                <li key={key} {...rest}>
+                  <Checkbox icon={checkIcon} checkedIcon={checkedIcon} sx={{ mr: 1 }} checked={selected} />
+                  {option.jmeno}
+                </li>
+              );
             }}
             renderInput={(params) => <TextField {...params} label="Weby" size="small" />}
           />
@@ -136,12 +153,22 @@ export default function ArticlesPage() {
           />
           <Autocomplete
             multiple
+            disableCloseOnSelect
             sx={{ minWidth: 240, flex: 1 }}
             options={authors ?? []}
             value={selectedAuthors}
             onChange={(_e, v) => {
               setSelectedAuthors(v);
               resetPage();
+            }}
+            renderOption={(props, option, { selected }) => {
+              const { key, ...rest } = props;
+              return (
+                <li key={key} {...rest}>
+                  <Checkbox icon={checkIcon} checkedIcon={checkedIcon} sx={{ mr: 1 }} checked={selected} />
+                  {option}
+                </li>
+              );
             }}
             renderInput={(params) => <TextField {...params} label="Autoři" size="small" />}
           />
