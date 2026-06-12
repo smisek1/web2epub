@@ -72,6 +72,10 @@ kniha_clanek(id_clanek_kniha, id_clanky→clanky, id_kniha→kniha)   -- M:N
 - Po větším celku se zastav a zeptej, nepokračuj automaticky.
 - Schéma se mění přes nový očíslovaný soubor v `db/init/` (běží při čisté DB) — pro běžící
   DB aplikuj migraci ručně přes `psql`.
+- **Lokální změny mimo git vždy ohlas a zeptej se.** Když měníš něco jen lokálně — data či
+  konfiguraci v běžící DB (`psql`, UI), stav kontejnerů, cokoliv co není v repu — výslovně
+  na to upozorni a zeptej se, jestli to zapsat i do gitu (typicky nový seed v `db/init/`).
+  Čistý start `./01_create_environment.sh` maže DB volume a vše jen-lokální se ztratí.
 
 ## Zálohy
 
