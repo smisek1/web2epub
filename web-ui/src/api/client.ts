@@ -68,6 +68,11 @@ export const api = {
   testXpath: (body: Record<string, string>) =>
     request<XpathTestResult>(`/xpath/test`, { method: "POST", body: JSON.stringify(body) }),
   startScrape: () => request<{ jobId: string; status: string }>(`/scrape`, { method: "POST" }),
+  purge: () =>
+    request<{ deletedArticles: number; deletedBooks: number; keptArticles: number }>(
+      `/maintenance/purge`,
+      { method: "POST", body: JSON.stringify({ confirm: true }) },
+    ),
   getScrapeJob: (jobId: string) => request<ScrapeJob>(`/scrape/${jobId}`),
   // Direct browser download (sets Content-Disposition) — not via fetch.
   downloadBookUrl: (id: number) => `${BASE}/books/${id}/download`,
