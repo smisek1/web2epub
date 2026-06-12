@@ -2,8 +2,26 @@
 the article HTML are decoded back to binary and added as separate EPUB items."""
 import base64
 
+from lxml import etree
+from lxml import html as lxml_html
 from scrapy.selector import Selector
 from ebooklib import epub
+
+
+def strip_links(html_text):
+    """Unwrap <a> tags (keep text/images) — links are dead weight in an
+    e-reader (#14). Also drops srcset/sizes left over in legacy articles."""
+    if not html_text:
+        return html_text
+    try:
+        root = lxml_html.fragment_fromstring(html_text, create_parent="div")
+    except Exception:
+        return html_text  # malformed HTML must not abort the book
+    etree.strip_tags(root, "a")
+    etree.strip_attributes(root, "srcset", "sizes")
+    parts = [root.text or ""]
+    parts += [etree.tostring(child, encoding="unicode") for child in root]
+    return "".join(parts)
 
 
 class create_book:
@@ -24,7 +42,7 @@ class create_book:
     def add_kap(self, clanek, nadpis, datum, uvodni_odstavec, stranka, autor):
         self.citac = self.citac + 1
         c1 = epub.EpubHtml(title=nadpis, file_name="chap_%03d.xhtml" % self.citac, lang="cs")
-        clanek = self.__replace_base64_img(clanek)
+        clanek = self.__replace_base64_img(strip_links(clanek))
         c1.content = (
             u"<h3>" + nadpis + " (" + stranka + ")</h3><p>" + str(autor) + "</p><p>"
             + str(datum) + "</p><p>" + str(uvodni_odstavec) + "</p><p>" + clanek + "</p>"
