@@ -27,13 +27,19 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   return res.json() as Promise<T>;
 }
 
-function articlesQuery(f: ArticleFilters): string {
+// Only the filters — shared by the paginated list and the unpaginated id lookup.
+function filterParams(f: ArticleFilters): URLSearchParams {
   const p = new URLSearchParams();
   f.web?.forEach((w) => p.append("web", String(w)));
   if (f.dateFrom) p.set("dateFrom", f.dateFrom);
   if (f.dateTo) p.set("dateTo", f.dateTo);
   f.autor?.forEach((a) => p.append("autor", a));
   if (f.q) p.set("q", f.q);
+  return p;
+}
+
+function articlesQuery(f: ArticleFilters): string {
+  const p = filterParams(f);
   p.set("page", String(f.page));
   p.set("pageSize", String(f.pageSize));
   if (f.sortBy) p.set("sortBy", f.sortBy);
@@ -44,6 +50,9 @@ function articlesQuery(f: ArticleFilters): string {
 export const api = {
   listArticles: (f: ArticleFilters) =>
     request<ArticlesResponse>(`/articles?${articlesQuery(f)}`),
+  // Ids of every article matching the filters, regardless of the current page.
+  listArticleIds: (f: ArticleFilters) =>
+    request<number[]>(`/articles/ids?${filterParams(f).toString()}`),
   getArticle: (id: number) => request<ArticleDetail>(`/articles/${id}`),
   listAuthors: (web?: number[]) => {
     const p = new URLSearchParams();

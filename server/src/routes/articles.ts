@@ -1,7 +1,14 @@
 import type { FastifyInstance } from "fastify";
 import { z } from "zod";
 
-import { listArticles, listAuthors, getArticle, trashArticles, removeLinks } from "../db/queries/articles.js";
+import {
+  listArticles,
+  listArticleIds,
+  listAuthors,
+  getArticle,
+  trashArticles,
+  removeLinks,
+} from "../db/queries/articles.js";
 import { runPython, scriptPath } from "../services/python.js";
 
 // "web" may arrive as ?web=2&web=7 or ?web=2,7 — normalise to int[].
@@ -23,12 +30,17 @@ const toStrArray = (v: string | string[] | undefined): string[] | undefined => {
   return arr.length ? arr : undefined;
 };
 
-const listQuerySchema = z.object({
+// The filters both /articles and /articles/ids share — defined once so the two
+// endpoints cannot drift apart.
+const filterQuerySchema = z.object({
   web: z.union([z.string(), z.array(z.string())]).optional().transform(toIntArray),
   dateFrom: z.string().optional(),
   dateTo: z.string().optional(),
   autor: z.union([z.string(), z.array(z.string())]).optional().transform(toStrArray),
   q: z.string().optional(),
+});
+
+const listQuerySchema = filterQuerySchema.extend({
   page: z.coerce.number().int().min(1).default(1),
   pageSize: z.coerce.number().int().min(1).max(200).default(50),
   sortBy: z.enum(["datum", "nadpis"]).default("datum"),
@@ -51,6 +63,19 @@ export async function articleRoutes(app: FastifyInstance) {
       pageSize: q.pageSize,
       sortBy: q.sortBy,
       sortDir: q.sortDir,
+    });
+  });
+
+  // Every id behind the current filter, unpaginated — backs the UI's "select
+  // all" button, which otherwise could not reach past the visible page.
+  app.get("/api/articles/ids", async (req) => {
+    const q = filterQuerySchema.parse(req.query);
+    return listArticleIds({
+      web: q.web ?? null,
+      dateFrom: q.dateFrom ?? null,
+      dateTo: q.dateTo ?? null,
+      autor: q.autor ?? null,
+      q: q.q ?? null,
     });
   });
 

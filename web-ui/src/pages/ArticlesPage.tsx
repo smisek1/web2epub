@@ -90,6 +90,23 @@ export default function ArticlesPage() {
 
   const selectedIds = selection.map(Number);
   const clearSelection = () => setSelection([]);
+  const total = data?.total ?? 0;
+
+  // "Select all" must reach articles beyond the page on screen, so the ids come
+  // from the server instead of from the rows the grid currently holds.
+  const [selectingAll, setSelectingAll] = useState(false);
+  const [selectAllError, setSelectAllError] = useState<string | null>(null);
+  const selectAll = async () => {
+    setSelectingAll(true);
+    setSelectAllError(null);
+    try {
+      setSelection(await api.listArticleIds(filters));
+    } catch (e) {
+      setSelectAllError((e as Error).message);
+    } finally {
+      setSelectingAll(false);
+    }
+  };
 
   const columns: GridColDef<Article>[] = [
     {
@@ -208,7 +225,17 @@ export default function ArticlesPage() {
         </Stack>
       </Paper>
 
-      <Stack direction="row" spacing={2} alignItems="center">
+      <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap" useFlexGap>
+        <Button
+          variant="outlined"
+          disabled={selectingAll || total === 0 || selectedIds.length === total}
+          onClick={selectAll}
+        >
+          {selectingAll ? "Vybírám…" : `Vybrat vše (${total})`}
+        </Button>
+        <Button variant="text" disabled={selectedIds.length === 0} onClick={clearSelection}>
+          Zrušit výběr
+        </Button>
         <Button
           variant="contained"
           disabled={selectedIds.length === 0 || createBook.isPending}
@@ -273,6 +300,11 @@ export default function ArticlesPage() {
         <Alert severity="success">Staženo nových článků: {scrape.job.articlesAdded}</Alert>
       )}
       {scrape.job?.status === "failed" && <Alert severity="error">Scrape selhal: {scrape.job.error}</Alert>}
+      {selectAllError && (
+        <Alert severity="error" onClose={() => setSelectAllError(null)}>
+          Výběr všech selhal: {selectAllError}
+        </Alert>
+      )}
       {error && <Alert severity="error">{(error as Error).message}</Alert>}
 
       <div style={{ width: "100%" }}>
@@ -289,6 +321,9 @@ export default function ArticlesPage() {
           pageSizeOptions={[25, 50, 100]}
           checkboxSelection
           disableRowSelectionOnClick
+          // Without this the grid drops selected ids that are not on the current
+          // page, which would silently gut a "select all" spanning many pages.
+          keepNonExistentRowsSelected
           rowSelectionModel={selection}
           onRowSelectionModelChange={setSelection}
         />

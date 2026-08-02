@@ -32,6 +32,20 @@ const FROM = `
   JOIN stranka s ON s.id_stranka = c.id_stranka
   LEFT JOIN kniha_clanek kc ON kc.id_clanky = c.id_clanky`;
 
+// Just the filter part of ArticleFilters — pagination and sorting are irrelevant
+// when the caller wants every matching row.
+export type ArticleIdFilters = Pick<ArticleFilters, "web" | "dateFrom" | "dateTo" | "autor" | "q">;
+
+// All matching article ids, unpaginated. Feeds the "select all" button, which
+// has to reach articles beyond the page currently on screen.
+export async function listArticleIds(f: ArticleIdFilters): Promise<number[]> {
+  const res = await pool.query<{ id: number }>(
+    `SELECT c.id_clanky AS id ${FROM} ${WHERE} ORDER BY c.datum DESC, c.nadpis`,
+    [f.web, f.dateFrom, f.dateTo, f.autor, f.q],
+  );
+  return res.rows.map((r) => r.id);
+}
+
 export async function listArticles(f: ArticleFilters) {
   const filterParams = [f.web, f.dateFrom, f.dateTo, f.autor, f.q];
 
