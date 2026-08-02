@@ -24,8 +24,12 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Install the crontab. The mounted ./config/crontab is also copied here so the
 # image is self-contained; compose may override it with a bind mount.
+# /etc/cron.d/* is picked up by the cron daemon automatically — do not also
+# `crontab` this file, that would register the same job a second time (and,
+# since personal crontabs don't have a user column, misparse "root" as part
+# of the command).
 COPY config/crontab /etc/cron.d/web2epub
-RUN chmod 0644 /etc/cron.d/web2epub && crontab /etc/cron.d/web2epub
+RUN chmod 0644 /etc/cron.d/web2epub
 
 # cron does not inherit the container environment, so the entrypoint snapshots
 # it into /etc/environment before starting cron in the foreground.

@@ -1,3 +1,5 @@
 # /etc/cron.d format: m h dom mon dow user command
+# cron's own PATH lacks /usr/local/bin, where the python:3.11-slim image puts python3.
+PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 # Daily scrape of all enabled sources at 23:00. Output goes to the container log.
 0 23 * * * root . /etc/environment; cd /app && python3 scripts/scrape_cli.py >> /proc/1/fd/1 2>&1
